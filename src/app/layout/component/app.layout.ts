@@ -5,7 +5,7 @@ import { filter, Subscription } from 'rxjs';
 import { LayoutService } from '../service/layout.service';
 import { AppFooter } from './app.footer';
 import { AppSidebar } from './app.sidebar';
-import { AppTopbar } from './app.topbar';
+import { AppTopbar } from './app-topbar/app.topbar';
 
 @Component({
     selector: 'app-layout',
@@ -14,7 +14,7 @@ import { AppTopbar } from './app.topbar';
     template: `<div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
-        <div class="layout-main-container !pt-32 sm:!pt-24">
+        <div class="layout-main-container !pt-32 sm:!pt-[48px]">
             <div class="layout-main">
                 <router-outlet></router-outlet>
             </div>

@@ -1,0 +1,76 @@
+<div id="eis-v3__topbar" class="layout-topbar flex-col sm:flex-row h-auto shadow">
+    <div class="flex md:items-center justify-between w-full flex-col md:flex-row space-x-2 mt-5 sm:mt-0">
+        <a class="layout-topbar-logo sm:hidden flex" routerLink="/">
+            <p-image src="assets/image/logo-banner-new-hsv.png" alt="Image" width="70" [preview]="true" />
+            <div class="text-md font-sans">
+                <!-- <div class="leading-[6px]">
+                    <span class="dark:text-[#e7bc5c] text-[#d6ab4e] italic font-bold text-[0.9em]">Smart</span>
+                    <span class="text-[1.2em] tracking-tighter ml-0.5 font-semibold">AMS</span>
+                </div>
+                <span class="text-xs font-bold text-[#969696] dark:text-[#838383]">Asset Management Solution</span> -->
+            </div>
+        </a>
+        <div class="flex-1 flex justify-between items-center border-t mt-2 sm:mt-0 sm:border-t-0">
+            <div class="flex gap-2">
+                <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+                    <i class="pi pi-bars"></i>
+                </button>
+                <a class="layout-topbar-logo hidden sm:flex" routerLink="/">
+                    <p-image src="assets/image/logo-banner-new-hsv.png" alt="Image" width="70" [preview]="true" />
+                    <div class="text-md font-sans -mb-1">
+                        <!-- <div class="leading-[6px]">
+                            <span class="dark:text-[#e7bc5c] text-[#d6ab4e] italic font-bold text-[0.9em]">Smart</span>
+                            <span class="text-[1.2em] tracking-tighter ml-0.5 font-semibold">AMS</span>
+                        </div>
+                        <span class="text-xs font-bold text-[#969696] dark:text-[#838383]">Asset Management
+                            Solution</span> -->
+                    </div>
+                </a>
+            </div>
+
+
+            <div>
+                <div class="layout-topbar-actions">
+                    <div class="layout-config-menu">
+                        <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
+                            <i
+                                [ngClass]="{ 'pi ': true, 'pi-sun': !layoutService.isDarkTheme(), 'pi-moon': layoutService.isDarkTheme() }"></i>
+                        </button>
+                    </div>
+                    <div class="layout-topbar-menu  ">
+                        <div class="layout-topbar-menu-content">
+                            <button type="button" class="layout-topbar-action" (click)="toggle($event)">
+                                <i class="pi pi-user"></i>
+                                <span>Profile</span>
+                            </button>
+
+                            <p-popover #op>
+                                <div class="flex flex-col gap-4">
+                                    <div>
+                                        <ul class="list-none p-0 m-0 flex flex-col">
+                                            <li *ngFor="let member of members"
+                                                class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border"
+                                                (click)="selectMember(member)">
+                                                <img src="assets/image/user-icon.png" style="width: 32px" />
+                                                <div>
+                                                    <span class="font-medium">{{ member.name }}</span>
+                                                    <div class="text-sm text-surface-500 dark:text-surface-400">{{
+                                                        member.email }}</div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </p-popover>
+                            <button type="button" class="layout-topbar-action" (click)="logout()">
+                                <i [title]="token !== null ? 'Logout' : 'Login'"
+                                    [class]="token !== null ? 'pi pi-sign-out' : 'pi pi-sign-in'"></i>
+                                <span>Log Out</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

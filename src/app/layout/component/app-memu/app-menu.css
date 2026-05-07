@@ -1,0 +1,107 @@
+.layout-menu {
+    list-style-type: none;
+    padding: 0 0.5rem; /* Cách đều 2 bên mép sidebar */
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.menu-separator {
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+.menu-list-item {
+    margin-bottom: 0.25rem;
+}
+
+/* --- STYLE CHO THANH MENU CHA --- */
+.menu-bar-parent {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    color: #4b5563; /* Màu xám chữ mặc định */
+    transition: all 0.2s ease-in-out;
+    user-select: none;
+}
+
+.menu-bar-parent .icon-menu {
+    color: #9ca3af; /* Màu icon mặc định */
+    transition: color 0.2s;
+}
+
+.menu-bar-parent .icon-arrow {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+/* Hiệu ứng Hover */
+.menu-bar-parent:hover {
+    background: #f3f4f6; /* Xám nhạt */
+    color: #1f2937;
+}
+.menu-bar-parent:hover .icon-menu {
+    color: #6b7280;
+}
+
+/* Hiệu ứng Active (Khi đang xổ xuống) */
+.menu-bar-parent.active {
+    background: #eff6ff; /* Xanh dương nhạt */
+    color: #2563eb; /* Chữ xanh dương đậm */
+    font-weight: 600;
+}
+
+.menu-bar-parent.active .icon-menu,
+.menu-bar-parent.active .icon-arrow {
+    color: #2563eb;
+}
+
+
+/* --- HIỆU ỨNG MƯỢT MÀ KHÔNG BỊ ĐƠ (CSS GRID) --- */
+.submenu-container {
+    display: grid;
+    grid-template-rows: 0fr; /* Đóng */
+    transition: grid-template-rows 0.3s ease-in-out;
+}
+
+.submenu-expanded {
+    grid-template-rows: 1fr; /* Mở */
+}
+
+.submenu-inner {
+    overflow: hidden; /* Bắt buộc để giấu nội dung khi đóng */
+}
+
+/* --- CẤU TRÚC LÙI VÀO CHO MENU CON --- */
+.submenu-content {
+    display: block;
+    padding-left: 2.5rem; /* Lùi vào trong để phân biệt với cha */
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+/* Nếu bạn muốn custom thêm style cho các thẻ <li> bên trong app-menuitem */
+::ng-deep .submenu-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+::ng-deep .submenu-content li a {
+    display: block;
+    padding: 0.6rem 1rem;
+    color: #4b5563;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+    margin-bottom: 0.15rem;
+}
+
+::ng-deep .submenu-content li a:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+::ng-deep .submenu-content li.active-menuitem > a {
+    color: #2563eb;
+    font-weight: 600;
+}

@@ -2,18 +2,18 @@
 
 .layout-sidebar {
     position: fixed;
-    width: 23.5rem;
-    height: calc(100vh - 8rem);
+    width: 18.5rem;
+    height: calc(100vh - 3rem);
     z-index: 999;
     overflow-y: auto;
     user-select: none;
-    top: 6rem;
-    left: 2rem;
+    top: 48px;
+    left: 0rem;
     transition:
         transform var(--layout-section-transition-duration),
         left var(--layout-section-transition-duration);
     background-color: var(--surface-overlay);
-    border-radius: var(--content-border-radius);
+    // border-radius: var(--content-border-radius);
 }
 
 .layout-menu {
