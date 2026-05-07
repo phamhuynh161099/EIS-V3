@@ -1,0 +1,251 @@
+<section class="flex flex-col min-h-full w-full">
+    <p-toast />
+    <div class="header-title">
+        <h2 class="mb-0 text-2xl sm:text-3xl mr-auto">{{this.valLanguage.UserManagement[this.optionLanguage]}}</h2>
+    </div>
+    <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+        <p-table #dt1 class="table_minheight" [scrollable]="true" scrollHeight="600px" virtualScrollItemSize="600"
+            [loading]="loadingTable" [columns]="cols" [value]="data" [paginator]="true" [rows]="50"
+            [showCurrentPageReport]="true" exportFilename="User Management" [exportHeader]="'customExportHeader'"
+            [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort($event)" [customSort]="true"
+            [totalRecords]="totalRecords" [globalFilterFields]="['userid', 'uname', 'e_mail', 'cell_nb']"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            editMode="row" dataKey="userid" [rowsPerPageOptions]="[50, 100, 200, 500 ,1000]">
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto *:*:text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button severity="secondary" class="col-start-1 col-span-2 xl:col-start-1 xl:col-span-1"
+                            [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" [outlined]="true"
+                            icon="pi pi-filter-slash" (click)="onClearTable(dt1)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[this.optionLanguage]"
+                            (click)="exportToExcel()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter()"></p-button>
+<!--                        <p-button [outlined]="true" icon="pi pi-plus"-->
+<!--                                  [label]="this.valLanguage.btn_Create[optionLanguage]" (click)="onCreate()"></p-button>-->
+                    </div>
+                    <p-iconfield iconPosition="left"
+                        class="btn_search_global flex-1 row-start-1 col-start-1 col-end-5 xl:col-start-10 xl:col-end-13 ">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="global_sv.onGlobalFilter($event, dt1)"
+                            title="{{this.valLanguage.searchByUserManagement[this.optionLanguage]}}"
+                            placeholder="{{this.valLanguage.searchByUserManagement[this.optionLanguage]}}" />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header pTemplate="header">
+                <tr>
+                    <th colspan="2"></th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{header.header}}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th colspan="2"></th>
+                    @for (col of cols; track col.field) {
+                    @if (col.type == 'Text') {
+                    <th><p-columnFilter matchMode="contains" type="text" [field]="col.field"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Number') {
+                    <th><p-columnFilter type="numeric" [field]="col.field"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loading ? 'Loading...Please wait!' : 'yyyy-MM-DD'"
+                                        [disabled]="loading" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    } @else if (col.type == 'MultiSelect') {
+                    <th>
+                        <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'corp_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="false" [selectAll]="selectAllCorpTable"
+                                    [(ngModel)]="corpTableFilterValue" (onChange)="filter(corpTableFilterValue)"
+                                    optionLabel="label" [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30" [filter]="false"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-32"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'corp_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_corp_nm>
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getCorpColor(option.label)" *ngIf="option.label" />
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'grade_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined" id="grade_filter"
+                                    [showToggleAll]="false" [selectAll]="selectAllGradeTable"
+                                    [(ngModel)]="gradeTableFilterValue" (onChange)="filter(gradeTableFilterValue)"
+                                    optionLabel="label" [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30" [filter]="false"
+                                    class="multiselect-custom-virtual-scroll max-w-full"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'grade_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_grade_nm>
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getGradeColor(option.label)" *ngIf="option.label" />
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                <tr [pEditableRow]="information" [ngClass]="{
+                                        'even-row': ri % 2 === 0,
+                                        'odd-row': ri % 2 === 1,
+                                        'selected-row': selectedRow === ri,
+                                        'clickable-row': true
+                                    }">
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <button pButton pRipple pInitEditableRow type="button" icon="pi pi-pencil"
+                                (click)="onRowEditInit(information, ri)" text rounded severity="info"></button>
+                        </div>
+                    </td>
+                    <td aria-describedby="list_rn">{{ ri + 1 }}</td>
+                    <td *ngFor="let col of columns" class="text-nowrap">
+                        @if (col.field !== 'reg_dt_ymd' && col.field !== 'userid' && col.field !== 'reg_nm'&&
+                        col.field!== 'chg_nm' && col.field!== 'chg_dt_ymd') {
+                        @if (col.field == 'corp_nm' || col.field == 'grade_nm'){
+                        <p-tag *ngIf="information[col.field] != null" [value]="information[col.field]"
+                            class="w-full !py-2"
+                            [severity]="col.field == 'corp_nm' ? global_sv.getCorpColor(information[col.field]) : global_sv.getGradeColor(information[col.field])" />
+                        } @else {
+                        {{ information[col.field] }}
+                        }
+                        }
+                        @else {
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd'){
+                        {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        }
+                        @else{
+                        {{ information[col.field] }}
+                        }
+                        }
+                    </td>
+                </tr>
+
+            </ng-template>
+        </p-table>
+
+        <p-dialog [header]="selectedUserId" [(visible)]="isShowDialog" class="h-[60rem] md:h-[50rem]"
+            [style]="{ width: '60rem' }">
+            <div class="space-y-7 md:h-auto !max-h-[100%]">
+
+                <div class="flex *:flex-1 gap-2">
+                    <div class="*:grid *:md:grid-cols-2 *:gap-7 *:md:gap-2 space-y-7 mt-5">
+                        <div>
+                            <p-floatlabel>
+                                <input class="w-full" id="username" pInputText [(ngModel)]="selectedUserName" />
+                                <label for="username">{{this.valLanguage.grid_User_Name[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input class="w-full" id="pwd" pInputText [(ngModel)]="selectedPwd" />
+                                <label for="pwd">{{this.valLanguage.grid_Password[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                        <div>
+                            <p-floatlabel>
+                                <input class="w-full" id="e_mail" pInputText [(ngModel)]="selectedEmail" />
+                                <label for="e_mail">{{this.valLanguage.grid_EMail[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input class="w-full" id="cell_nm" pInputText [(ngModel)]="selectedCelNm" />
+                                <label for="cell_nm">{{this.valLanguage.grid_Phone_Number[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
+
+                    <div class="*:grid *:md:grid-cols-2 *:gap-7 *:md:gap-2 space-y-7 mt-5">
+                        <div>
+                            <p-floatlabel>
+                                <p-select inputId="corp_label" class="w-full" [loading]="loading"
+                                    [(ngModel)]="selectedCorpNm" [options]="corps" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" *ngIf="option.label"
+                                            [severity]="global_sv.getCorpColor(option.label)" />
+                                    </ng-template>
+                                </p-select>
+                                <label for="corp_label">{{this.valLanguage.grid_Corp[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <p-select inputId="grade_label" class="w-full" [loading]="loading"
+                                    [(ngModel)]="selectedGradeNm" [options]="grades" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="global_sv.getGradeColor(option.label)" />
+                                    </ng-template>
+                                </p-select>
+                                <label for="grade_label">{{this.valLanguage.grid_Grade[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+
+                        <div>
+                            <p-floatlabel>
+                                <p-select inputId="screen_alarm_label" class="w-full" [loading]="loading"
+                                    [(ngModel)]="selectedScreenAlarm" [options]="screenAlarms" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="option.value == 'Y' ? 'success' : 'danger'" />
+                                    </ng-template>
+                                </p-select>
+                                <label
+                                    for="screen_alarm_label">{{this.valLanguage.grid_Screen_Alarm[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <p-select inputId="mail_label" class="w-full" [loading]="loading"
+                                    [(ngModel)]="selectedMail" [options]="screenAlarms" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="option.value == 'Y' ? 'success' : 'danger'" />
+                                    </ng-template>
+                                </p-select>
+                                <label for="mail_label">{{this.valLanguage.grid_Mail[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
+                </div>
+                <p-floatlabel>
+                    <textarea pTextarea id="over_label" [(ngModel)]="selectedMemo" rows="8"
+                        style="resize: none; width: 100%;" class="h-full"></textarea>
+                    <label for="over_label">{{this.valLanguage.grid_Memo[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <div class="flex justify-between items-center">
+                    <p-button icon="pi pi-refresh" aria-label="Refresh" (click)="onResetUpdate()"
+                        [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="info" />
+                    <div class="scroll-p-2 space-x-2">
+                        <p-button label="{{this.valLanguage.btn_Cancel[this.optionLanguage]}}" severity="secondary"
+                            (click)="onEditCancel()" />
+                        <p-button label="{{this.valLanguage.btn_Save[this.optionLanguage]}}" (click)="onEditSaved()" />
+                    </div>
+                </div>
+            </div>
+        </p-dialog>
+
+    </section>
+</section>

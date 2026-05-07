@@ -1,0 +1,261 @@
+<section>
+    <p-toast />
+    <p-dialog [header]="name_dialog" [modal]="true" [(visible)]="visible" class="image-dialog"
+        [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+        <p-image class="logo_full" [alt]="img_val" [src]="img_val" alt="Image" width="250" [preview]="true" />
+    </p-dialog>
+    <div class="header-title">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3 xl:mb-0">
+            <h2 class="text-2xl sm:text-3xl mr-auto">{{this.valLanguage.EquipmentAssetReport[this.optionLanguage]}}
+                <p-progress-spinner *ngIf="loading_full" class="spinner-cl pl-3" strokeWidth="5" fill="transparent"
+                    animationDuration=".5s" [style]="{ width: '20px', height: '20px', color: '#333' }" />
+            </h2>
+            <div class="flex gap-2 *:w-[120px] *:*:w-full ml-auto">
+                <p-button severity="info" variant="outlined" icon="pi pi-search"
+                    [label]="this.valLanguage.btn_Search[this.optionLanguage]" (click)="filterChooseSearch()" />
+                <p-button [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="secondary"
+                    icon="pi pi-refresh" (click)="ngOnInit()" />
+            </div>
+        </div>
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 rounded gap-5 *:mt-2 *:mx-auto *:max-w-sm *:w-full box p-5 header-border-filter">
+            <div class="flex gap-2 *:w-full *:*:w-full">
+                <p-floatlabel>
+                    <p-select [(ngModel)]="corpFilterValue" [options]="corpFac" [showClear]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getCorpColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="corp">{{this.valLanguage.grid_Corp[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel>
+                    <p-select [filter]="true" filterBy="label" [(ngModel)]="parentFilterValue"
+                        (onChange)="handleChangeParent($event)" [options]="parent" [showClear]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                        </ng-template>
+                    </p-select>
+                    <label for="parent_filter">{{this.valLanguage.grid_Parent[this.optionLanguage]}}</label>
+                </p-floatlabel>
+            </div>
+            <p-floatlabel>
+                <p-select [filter]="true" filterBy="label" class="w-full" [(ngModel)]="typeFilterValue" [options]="type"
+                    [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                    </ng-template>
+                </p-select>
+                <label for="storage">{{this.valLanguage.grid_Type[this.optionLanguage]}}</label>
+            </p-floatlabel>
+
+            <p-floatlabel>
+                <p-select [filter]="true" filterBy="label" class="w-full" [(ngModel)]="groupFilterValue"
+                    [options]="group" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                    </ng-template>
+                </p-select>
+                <label for="parent_filter">{{this.valLanguage.grid_Group[this.optionLanguage]}}</label>
+            </p-floatlabel>
+
+            <p-floatlabel>
+                <input class="w-full" pInputText [(ngModel)]="modelFilterValue" />
+                <label for="model_filter">{{this.valLanguage.grid_Model[this.optionLanguage]}}</label>
+            </p-floatlabel>
+
+            <div class="flex flex-wrap gap-4 box p-2 border border-[var(--p-primary-color)] rounded-md" pRipple>
+                <!-- <label for="ingredient1" class="ml-2">{{this.valLanguage.grid_Language[this.optionLanguage]}}: </label> -->
+                <div class="flex items-center">
+                    <p-radiobutton id="ingredient1" name="pizza" value="" [(ngModel)]="language" inputId="language1" />
+                    <label for="ingredient1" class="ml-2">English</label>
+                </div>
+
+                <div class="flex items-center">
+                    <p-radiobutton id="ingredient2" name="pizza" value="korean" [(ngModel)]="language"
+                        inputId="language2" />
+                    <label for="ingredient2" class="ml-2">Korean</label>
+                </div>
+
+                <div class="flex items-center">
+                    <p-radiobutton id="ingredient3" name="pizza" value="vietnam" [(ngModel)]="language"
+                        inputId="language3" />
+                    <label for="ingredient3" class="ml-2">Vietnam</label>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-4 box p-2 border border-[var(--p-primary-color)] rounded-md" pRipple>
+                <div class="flex items-center">
+                    <p-radiobutton id="total" name="pizza" value="" [(ngModel)]="erp" inputId="language1" />
+                    <label for="total" class="ml-2">Total</label>
+                </div>
+
+                <div class="flex items-center">
+                    <p-radiobutton id="not_in_erp" name="pizza" value="008" [(ngModel)]="erp" inputId="language2" />
+                    <label for="not_in_erp" class="ml-2">Not in ERP</label>
+                </div>
+
+                <div class="flex items-center">
+                    <p-radiobutton id="erp" name="pizza" value="000" [(ngModel)]="erp" inputId="erp" />
+                    <label for="erp" class="ml-2">ERP</label>
+                </div>
+            </div>
+            <p-floatlabel>
+                <p-datepicker class="style_date w-full *:w-full" [showButtonBar]="true" dateFormat="yy/mm/dd"
+                    [(ngModel)]="regDateFilterValue" selectionMode="range" inputReadonly="true" />
+                <label for="create_date">{{this.valLanguage.grid_Create_Date[this.optionLanguage]}} (from-to)</label>
+            </p-floatlabel>
+        </div>
+    </div>
+    <div class="card">
+        <p-table #dtInformation class="table_minheight" [columns]="cols" showGridlines [loading]="loading"
+            [value]="virtualAsset" [rows]="rows" rowGroupMode="rowspan" [resizableColumns]="true" groupRowsBy="prt_nm"
+            (onSort)="onTableSort($event)" [sortMode]="'multiple'" [filters]="filters"
+            [globalFilterFields]="['prt_nm', 'tp_nm', 'group_nm', 'md_cd']" [loading]="loading" [paginator]="true"
+            [showCurrentPageReport]="true" [rowsPerPageOptions]="[rows, 25, 50]" [paginator]="true" [first]="first"
+            [rowHover]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto *:*:text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button label="{{this.valLanguage.btn_ClearFilter[this.optionLanguage]}}" [outlined]="true"
+                            severity="secondary" icon="pi pi-filter-slash" (click)="clear(dtInformation)" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="ShowFilter()"></p-button>
+                        <p-button [outlined]="true" icon="pi pi-external-link"
+                            [label]="this.valLanguage.btn_Export[this.optionLanguage]" (click)="exportToExcel()" />
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="onGlobalFilter($event, dtInformation)"
+                            title="{{this.valLanguage.searchByEquipmentAssetReport[this.optionLanguage]}}"
+                            placeholder="{{this.valLanguage.searchByEquipmentAssetReport[this.optionLanguage]}}" />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header let-columns>
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th [pSortableColumn]="col.field" rowspan="2" *ngFor="let col of columns">
+                        {{ col.header }}
+                        <p-sortIcon [field]="col.field" />
+                    </th>
+                    <th colspan="3" *ngFor="let col of colsParent">
+                        {{ col.header }}
+                    </th>
+                </tr>
+                <tr>
+                    <th [pSortableColumn]="col.field" *ngFor="let col of colsChild">
+                        {{ col.header }}
+                        <p-sortIcon [field]="col.field" />
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <td class="border-l border-b" style="border-color: var(--p-datatable-body-cell-border-color);"></td>
+                    <td *ngFor="let col of cols" class="border-l border-b pl-3 pr-1 text-center"
+                        style="border-color: var(--p-datatable-body-cell-border-color);">
+                        @if(col.field === 'prt_nm') {
+                        <p-columnFilter field="parent_name" matchMode="in" [showMatchModes]="false"
+                            [showOperator]="false" [showAddButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-multiselect [ngModel]="value" [options]="parentTB" placeholder="Select Parent"
+                                    (onChange)="filter($event.value, 'parent_name')" optionLabel="label"
+                                    [panelStyle]="{ minWidth: '16rem' }">
+                                    <ng-template #headercheckboxicon let-allSelected let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected" [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                            </ng-template>
+                        </p-columnFilter>
+                        }@else if(col.field === 'tp_nm') {
+                        <p-columnFilter field="type_name" matchMode="in" [showMatchModes]="false" [showOperator]="false"
+                            [showAddButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-multiselect [ngModel]="value" [options]="typeTB" placeholder="Select Type"
+                                    (onChange)="filter($event.value, 'type_name')" optionLabel="label"
+                                    [panelStyle]="{ minWidth: '16rem' }">
+                                    <ng-template #headercheckboxicon let-allSelected let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected" [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                            </ng-template>
+                        </p-columnFilter>
+                        }@else if(col.field === 'group_nm') {
+                        <p-columnFilter field="group_name" matchMode="in" [showMatchModes]="false"
+                            [showOperator]="false" [showAddButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-multiselect [ngModel]="value" [options]="groupTB" placeholder="Select Group"
+                                    (onChange)="filter($event.value, 'group_name')" optionLabel="label"
+                                    [panelStyle]="{ minWidth: '16rem' }">
+                                    <ng-template #headercheckboxicon let-allSelected let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected" [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                            </ng-template>
+                        </p-columnFilter>
+                        }@else if(col.field === 'md_cd'){
+                        <p-columnFilter type="text" [field]="col.field" [placeholder]="'Search by ' + col.header"
+                            [ariaLabel]="'Filter '+ col.header"></p-columnFilter>
+                        }@else if(col.field === 'lct_cd40'){
+                        <p-columnFilter type="text" [field]="col.field" [placeholder]="'Search by ' + col.header"
+                            [ariaLabel]="'Filter '+ col.header"></p-columnFilter>
+                        }@else {}
+
+                    </td>
+
+                    <td *ngFor="let col of colsChild; let  i = index"
+                        [class]="i === (colsChild.length-1) ? 'border-l border-r border-b' : 'border-l border-b'"
+                        style="border-color: var(--p-datatable-body-cell-border-color);">
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #body let-rowData let-columns="columns" let-rowIndex="rowIndex" let-rowgroup="rowgroup"
+                let-rowspan="rowspan">
+                <tr [ngClass]="{
+                        'total-row': rowIndex === 0 && rowData.md_cd === 'TOTAL',
+                        'selected-row': selectedRow === rowIndex,
+                        'selected-total-row': rowIndex === 0 && selectedRow === rowIndex && rowData.md_cd === 'TOTAL',
+                        'clickable-row': true
+
+                    }" (click)="onRowClick(rowIndex)">
+
+                    <td [class]="rowIndex === 0 && rowData.md_cd === 'TOTAL' ? 'total-cell' : 'clickable-row'">{{
+                        rowIndex + 1 }}</td>
+                    @for (col of columns; track $index) {
+                    @if(col.field === 'prt_nm') {
+                    <td *ngIf="rowgroup" [attr.rowspan]="rowspan"
+                        [class]="rowIndex === 0 && rowData.md_cd === 'TOTAL' ? 'total-cell' : ''">
+                        {{ rowData[col.field] }}
+                    </td>
+                    }@else {
+                    <td [class]="rowIndex === 0 && rowData.md_cd === 'TOTAL' ? 'total-cell' : ''">
+                        {{ rowData[col.field] }}
+                    </td>
+                    }
+
+                    }
+
+                    @for (col of colsChild; track $index) {
+                    <td [class]="rowIndex === 0 && rowData.md_cd === 'TOTAL' ? 'total-cell' : ''">
+                        {{ rowData[col.field] }}
+                    </td>
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="7">No customers found.</td>
+                </tr>
+            </ng-template>
+            <!-- <ng-template #loadingbody let-columns="columns">
+                <tr style="height:46px">
+                    <td *ngFor="let col of columns; let even = even">
+                        <p-skeleton [ngStyle]="{ width: even ? (col.field === 'year' ? '30%' : '40%') : '60%' }" />
+                    </td>
+                </tr>
+            </ng-template> -->
+        </p-table>
+    </div>
+</section>

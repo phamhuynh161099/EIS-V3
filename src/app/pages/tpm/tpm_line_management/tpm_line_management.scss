@@ -1,0 +1,64 @@
+h2,p {
+    margin: 0;
+}
+/* 1. Tăng độ rộng của thanh cuộn */
+.custom-main-wrapper::-webkit-scrollbar {
+  width: 10px;  /* Tăng từ 6px lên 10px (bạn có thể tăng/giảm số này tùy ý) */
+  height: 10px; /* Cuộn ngang nếu có */
+}
+
+/* 2. Ẩn hai nút mũi tên ở hai đầu */
+.custom-main-wrapper::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Rãnh (Track) */
+.custom-main-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+}
+
+/* Tay nắm (Thumb) */
+.custom-main-wrapper::-webkit-scrollbar-thumb {
+  background-color: #b0bec5;
+  border-radius: 8px;
+}
+
+.custom-main-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #90a4ae;
+}
+/* --- THÊM PHẦN NÀY CHO MOBILE (Màn hình dưới 768px) --- */
+@media screen and (max-width: 768px) {
+  /* 1. Chỉnh nhỏ thanh cuộn lại (ví dụ: 4px) */
+  .custom-main-wrapper::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  /* 2. Làm mờ tay nắm (Thumb) bằng cách dùng mã màu RGBA thay vì HEX */
+  .custom-main-wrapper::-webkit-scrollbar-thumb {
+    /* Chuyển mã #b0bec5 sang rgba và set độ trong suốt là 0.4 (40%) */
+    background-color: rgba(176, 190, 197, 0.4);
+  }
+
+  /* 3. (Tùy chọn) Khi người dùng chạm vào trên mobile thì rõ lên một chút */
+  .custom-main-wrapper::-webkit-scrollbar-thumb:hover,
+  .custom-main-wrapper::-webkit-scrollbar-thumb:active {
+    background-color: rgba(144, 164, 174, 0.7);
+  }
+}
+
+
+/* Custom toàn bộ khu vực header của Dialog */
+::ng-deep .p-dialog .p-dialog-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.5rem 1.5rem;
+}
+
+/* Custom riêng cái chữ (Text) bên trong Header */
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+    color: #1e293b; /* Màu chữ đậm (slate-800) */
+    font-size: 1.25rem; /* Chữ to hơn */
+    font-weight: 700; /* In đậm */
+}
+

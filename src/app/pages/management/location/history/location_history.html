@@ -1,0 +1,488 @@
+
+<section *ngIf="valLanguage" class="flex flex-col min-h-full w-full">
+    <div class="header-title">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3 xl:mb-0">
+            <h2 class="text-2xl sm:text-3xl mr-auto">{{this.valLanguage.LocationHistory[this.optionLanguage]}}</h2>
+            <div class="flex gap-2 *:w-[120px] *:*:w-full ml-auto">
+                <p-button [outlined]="true" icon="pi pi-search"
+                    [label]="this.valLanguage.btn_Search[this.optionLanguage]" (click)="onSearch()" severity="info" />
+                <p-button [outlined]="true" icon="pi pi-filter-slash" class="!w-28 *:!w-28"
+                    [label]="this.valLanguage.btn_Clear[this.optionLanguage]" (click)="onClearSearch()"
+                    severity="secondary" />
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 rounded justify-around gap-6 *:space-y-6 box p-5 header-border-filter">
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <input inputId="as_no_label" type="text" pInputText [(ngModel)]="selectedAs_nos" class="w-full" />
+                    <label for="as_no_label">{{this.valLanguage.grid_Asset_No[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select (onChange)="onChangeCorp()" inputId="corp_label" class="w-full" [loading]="loading"
+                        [(ngModel)]="selectedCorp" [options]="corps" [showClear]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2"
+                                [severity]="global_sv.getCorpColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="corp_label">{{this.valLanguage.grid_Corp[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="model_label" [options]="models" [(ngModel)]="selectedModel" [loading]="loading"
+                        optionValue="value" [filter]="true" filterBy="label" [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="model_label">{{this.valLanguage.grid_Model[this.optionLanguage]}}</label>
+                </p-floatlabel>
+            </div>
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-inputgroup inputId="material_label">
+                        <input inputId="material_label" type="text" pInputText [(ngModel)]="selectedMtCode"
+                            class="w-full" />
+                        <p-inputgroup-addon (click)="showDialog()" label="Show"><p-button
+                                icon="pi pi-plus" /></p-inputgroup-addon>
+                    </p-inputgroup>
+                    <label for="material_label">{{this.valLanguage.grid_Material[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-dialog id="search_dialog" [header]="this.valLanguage.Material_Search[this.optionLanguage]"
+                    [(visible)]="visible" class="h-screen" [style]="{ width: '30rem' }">
+                    <div class="flex items-center gap-4 mb-4">
+
+                        <p-multiselect [options]="listMtl" variant="outlined" [showToggleAll]="true" [selectAll]="false"
+                            [(ngModel)]="searchMtCodeList" optionLabel="value" [loading]="loading" optionValue="value"
+                            [virtualScroll]="true" [virtualScrollItemSize]="43"
+                            class="multiselect-custom-virtual-scroll max-w-full"
+                            [placeholder]="this.valLanguage.Select_Material_Code[this.optionLanguage]"
+                            [maxSelectedLabels]="2" styleClass="w-full" #ms>
+                            <ng-template #headercheckboxicon let-allSelected let-partialSelected="partialSelected">
+                                <i class="pi pi-check" *ngIf="allSelected"></i>
+                                <i class="pi pi-minus" *ngIf="partialSelected"
+                                    [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                            </ng-template>
+                        </p-multiselect>
+
+                    </div>
+                    <div class="flex items-start gap-4 mb-4 h-[500px] overflow-y-auto">
+                        <div class="flex-1 space-y-3">
+                            <div (click)="delFromSearchList(item)" *ngFor="let item of searchMtCodeList"
+                                class="p-2 border border-gray-light dark:border-gray-dark rounded-sm cursor-pointer">
+                                <div class="header-content">
+                                    <span>{{ item }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full flex flex-col md:flex-row *:flex-1 gap-2">
+                        <p-button id="apply_btn" class="*:w-full" size="large"
+                            [label]="this.valLanguage.btn_Apply_Search[this.optionLanguage]"
+                            (click)="handleApplySearch()" [raised]="true" severity="info" />
+                        <p-button id="apply_btn" class="*:w-full" size="large"
+                            [label]="this.valLanguage.btn_Clear_All[this.optionLanguage]" (click)="handleClearSearch()"
+                            [raised]="true" severity="danger" />
+                    </div>
+                </p-dialog>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="storage_label" [options]="storages" [loading]="loadingStorage"
+                        [emptyMessage]="this.valLanguage.select_Corp_emptyMessage[this.optionLanguage]"
+                        [(ngModel)]="selectedStorage" optionValue="value" [filter]="true" filterBy="label"
+                        [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="storage_label">{{this.valLanguage.grid_Storage[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="state_label" class="w-full" [loading]="loading" [(ngModel)]="selectedState"
+                        [options]="states" [showClear]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2"
+                                [severity]="global_sv.getStatusColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="state_label">{{this.valLanguage.grid_State[this.optionLanguage]}}</label>
+                </p-floatlabel>
+            </div>
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="reason_label" [options]="reasons" [loading]="loading"
+                        [(ngModel)]="selectedReason" optionValue="value" [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="success" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="reason_label">{{this.valLanguage.grid_Reason[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="departure_label" [options]="departures" [(ngModel)]="selectedDeparture"
+                        [loading]="loading" optionValue="value" [filter]="true" filterBy="label" [showClear]="true"
+                        class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="departure_label">{{this.valLanguage.grid_Departure[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="sap_label" [options]="saps" [(ngModel)]="selectedSap" optionValue="value"
+                        [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2"
+                                    [severity]="getIntf_result_nmColor(option.label)" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="sap_label">Sap</label>
+                </p-floatlabel>
+            </div>
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-datepicker inputId="date_label" id="datepicker_style" [maxDate]="now"
+                        [(ngModel)]="selectedRangeDates" class="w-full date-left" (onClearClick)="onClearFilterDate()"
+                        dateFormat="yy-mm-dd" (onClose)="onCloseFilterDate()" showIcon iconDisplay="input"
+                        selectionMode="range" [showButtonBar]="true" [readonlyInput]="true" />
+                    <label for="date_label">{{this.valLanguage.grid_Create_Date[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="destination_label" [options]="destinations" [(ngModel)]="selectedDestination"
+                        [loading]="loading" optionValue="value" [filter]="true" filterBy="label" [showClear]="true"
+                        class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="destination_label">{{this.valLanguage.grid_Destination[this.optionLanguage]}}</label>
+                </p-floatlabel>
+
+                <div class="flex *:flex-1 max-w-sm mx-auto gap-3">
+                    <p-floatlabel class="max-w-sm mx-auto">
+                        <p-select inputId="parent_label" [options]="parents" [(ngModel)]="selectedParent"
+                            [loading]="loading" optionValue="value" [filter]="true" filterBy="label" [showClear]="true"
+                            class="w-full">
+                            <ng-template let-option #item>
+                                <div class="flex items-center gap-2 w-full">
+                                    <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                                </div>
+                            </ng-template>
+                        </p-select>
+                        <label for="parent_label">{{this.valLanguage.grid_Parent[this.optionLanguage]}}</label>
+                    </p-floatlabel>
+                    <p-floatlabel class="max-w-sm mx-auto">
+                        <p-select inputId="loc_sts_cd_label" [options]="loc_sts_cds" [(ngModel)]="selectedLoc_sts_cd"
+                            optionValue="value" [showClear]="true" class="w-full">
+                            <ng-template let-option #item>
+                                <div class="flex items-center gap-2 w-full">
+                                    <p-tag [value]="option.label" class="w-full !py-2"
+                                        [severity]="getLct_sts_nmColor(option.label)" />
+                                </div>
+                            </ng-template>
+                        </p-select>
+                        <label for="loc_sts_cd_label">{{this.valLanguage.grid_Loc_sts_cd[this.optionLanguage]}}</label>
+                    </p-floatlabel>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+        <p-table #dt1 class="table_minheight" [scrollable]="true" scrollHeight="600px" virtualScrollItemSize="600"
+            [loading]="loadingTable" [columns]="cols" [value]="data" [paginator]="true" [rows]="50"
+            [showCurrentPageReport]="true" exportFilename="Location History" [exportHeader]="'customExportHeader'"
+            [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort($event)" [customSort]="true"
+            [totalRecords]="totalRecords" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            [rowsPerPageOptions]="[50, 100, 200, 500 ,1000]">
+            <ng-template #caption>
+                <div class="flex justify-between *:text-nowrap overflow-x-auto gap-4 py-2">
+                    <div class="flex gap-4">
+                        <p-button class="" [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]"
+                            [outlined]="true" icon="pi pi-filter-slash" (click)="onClearTable(dt1)" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            class="text-nowrap" [label]="this.valLanguage.btn_ShowFilter[optionLanguage]"
+                            (click)="showFilter()"></p-button>
+                        <p-button [outlined]="true" icon="pi pi-file-excel"
+                            [label]="this.valLanguage.btn_Export[this.optionLanguage]" (click)="exportToExcel()" />
+                    </div>
+                    <p-button [outlined]="true" icon="pi pi-filter-slash" class="text-nowrap"
+                        [label]="this.valLanguage.btn_Clear_All[this.optionLanguage]" (click)="onClearAllSearch()"
+                        severity="warn" />
+                </div>
+            </ng-template>
+            <ng-template #header pTemplate="header">
+                <tr>
+                    <th></th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{header.header}}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th></th>
+                    @for (col of cols; track col.field) {
+                    @if (col.type == 'Text') {
+                    <th><p-columnFilter type="text" matchMode="contains" [field]="col.field"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Number') {
+                    <th><p-columnFilter type="numeric" [field]="col.field"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loading ? 'Loading...Please wait!' : 'yyyy-MM-DD'"
+                                        [disabled]="loading" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    } @else if (col.type == 'Option') {
+                    <th>
+                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'corp_nm') {
+                                <p-select [loading]="loading" [(ngModel)]="corpTableFilterValue"
+                                    [options]="listOption[col.field]" (onChange)="filter(corpTableFilterValue)"
+                                    optionValue="label" filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" [severity]="global_sv.getCorpColor(option.label)"
+                                            class="w-full !py-2" />
+                                    </ng-template>
+                                </p-select>
+                                } @else if (col.field == 'lct_sts_nm') {
+                                <p-select [loading]="loading" [(ngModel)]="lct_sts_nmTableFilterValue"
+                                    [options]="listOption[col.field]" (onChange)="filter(lct_sts_nmTableFilterValue)"
+                                    optionValue="label" filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" [severity]="getLct_sts_nmColor(option.label)"
+                                            class="w-full !py-2" />
+                                    </ng-template>
+                                </p-select>
+                                } @else if (col.field == 'intf_result_nm') {
+                                <p-select [loading]="loading" [(ngModel)]="intf_result_nmTableFilterValue"
+                                    [options]="listOption[col.field]"
+                                    (onChange)="filter(intf_result_nmTableFilterValue)" optionValue="label"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" [severity]="getIntf_result_nmColor(option.label)"
+                                            class="w-full !py-2" />
+                                    </ng-template>
+                                </p-select>
+                                } @else if (col.field == 'last_yn') {
+                                <p-select [loading]="loading" [(ngModel)]="last_ynTableFilterValue"
+                                    [options]="listOption[col.field]" (onChange)="filter(last_ynTableFilterValue)"
+                                    optionValue="label" filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" [severity]="getLastYNColor(option.label)"
+                                            class="w-full !py-2" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    } @else if (col.type == 'MultiSelect') {
+                    <th>
+                        <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'mt_cd') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="true" [selectAll]="selectAllMtCodeTable"
+                                    [(ngModel)]="mtCodeTableFilterValue" (onChange)="filter(mtCodeTableFilterValue)"
+                                    optionLabel="value" [loading]="loading" optionValue="value" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'mt_cd')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_mt_cd>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'corp_nm') {
+                                <p-multiselect [options]="corpsFilter" variant="outlined"
+                                    [showToggleAll]="false" [selectAll]="selectAllCorpTable"
+                                    [(ngModel)]="corpTableFilterValue" (onChange)="filter(corpTableFilterValue)"
+                                    optionLabel="label" [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30" [filter]="false"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-32"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'corp_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_corp_nm>
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getCorpColor(option.label)" *ngIf="option.label" />
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'md_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="true" [selectAll]="selectAllMdNmTable"
+                                    [(ngModel)]="mdNmTableFilterValue" (onChange)="filter(mdNmTableFilterValue)"
+                                    optionLabel="value" [loading]="loading" optionValue="value" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'md_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_md_nm>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'lct_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="true" [selectAll]="selectAllLctNmTable"
+                                    [(ngModel)]="lctNmTableFilterValue" (onChange)="filter(lctNmTableFilterValue)"
+                                    optionLabel="label" [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'lct_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_lct_nm>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'from_lct_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="true" [selectAll]="selectAllFromLctNmTable"
+                                    [(ngModel)]="departureTableFilterValue"
+                                    (onChange)="filter(departureTableFilterValue)" optionLabel="label"
+                                    [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'from_lct_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_from_lct_nm>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                                @if (col.field == 'to_lct_nm') {
+                                <p-multiselect [options]="listOption[col.field]" variant="outlined"
+                                    [showToggleAll]="true" [selectAll]="selectAllToLctNmTable"
+                                    [(ngModel)]="destinationTableFilterValue"
+                                    (onChange)="filter(destinationTableFilterValue)" optionLabel="label"
+                                    [loading]="loading" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'to_lct_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_to_lct_nm>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-item let-i="rowIndex" pTemplate="body">
+                <tr [ngClass]="{
+                                        'even-row': i % 2 === 0,
+                                        'odd-row': i % 2 === 1,
+                                        'selected-row': elno === item.elno,
+                                        'clickable-row': true}" (click)="onRowClick(item.elno, item.re_mark)">
+                    <td aria-describedby="list_rn">{{ i + 1 }}</td>
+                    <td aria-describedby="list_corp_nm"><p-tag [value]=" item.corp_nm" class="w-full !py-2"
+                            [severity]="global_sv.getCorpColor(item.corp_nm)" /></td>
+                    <td aria-describedby="list_reg_dt_ymd" class="text-nowrap">{{ item.reg_dt_ymd | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td aria-describedby="list_mt_cd" class="text-nowrap">{{ item.mt_cd }}</td>
+                    <td aria-describedby="list_mt_nm" class="text-nowrap">{{ item.mt_nm }}</td>
+                    <td aria-describedby="list_md_nm" class="text-nowrap">{{ item.md_nm }}</td>
+                    <td aria-describedby="list_from_lct_nm" class="text-nowrap">{{ item.from_lct_nm }}</td>
+                    <td aria-describedby="list_to_lct_nm" class="text-nowrap">{{ item.to_lct_nm }}</td>
+                    <td aria-describedby="list_puchs_dt_ymd" class="text-nowrap">{{ item.puchs_dt_ymd | date:
+                        'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td aria-describedby="list_lct_sts_nm"><p-tag *ngIf="item.lct_sts_nm != ''"
+                            [value]=" item.lct_sts_nm" class="w-full !py-2"
+                            [severity]="getLocationStateColor(item.lct_sts_nm)" /></td>
+                    <td aria-describedby="list_intf_result_nm"><p-tag *ngIf="item.intf_result_nm != ''"
+                            [value]=" item.intf_result_nm" class="w-full !py-2"
+                            [severity]="getIntfResultNameColor(item.intf_result_nm)" /></td>
+                    <td aria-describedby="list_re_mark" class="text-nowrap">{{ item.re_mark }}</td>
+                    <td aria-describedby="list_factory_nm" class="text-nowrap">{{ item.factory_nm }}</td>
+                    <td aria-describedby="list_as_no" class="text-nowrap">{{ item.as_no }}</td>
+                    <td aria-describedby="list_prt_nm" class="text-nowrap">{{ item.prt_nm }}</td>
+                    <td aria-describedby="list_barcode " class="text-nowrap">{{ item.barcode }}</td>
+                    <td aria-describedby="list_cost_dept_nm" class="text-nowrap">{{ item.cost_dept_nm }}</td>
+                    <td aria-describedby="list_unit" class="text-nowrap">{{ item.unit }}</td>
+                    <td aria-describedby="list_quantity" class="text-nowrap">{{ item.quantity }}</td>
+                    <td aria-describedby="list_maker" class="text-nowrap">{{ item.maker }}</td>
+                    <td aria-describedby="list_sts_nm" class="text-nowrap">{{ item.sts_nm }}</td>
+                    <td aria-describedby="list_reason_nm" class="text-nowrap">{{ item.reason_nm }}</td>
+                    <td aria-describedby="list_charge_nm" class="text-nowrap">{{ item.charge_nm }}</td>
+                    <td aria-describedby="list_receive_nm" class="text-nowrap">{{ item.receive_nm }}</td>
+                    <td aria-describedby="list_mf_cd" class="text-nowrap">{{ item.mf_cd }}</td>
+                    <td aria-describedby="list_sp_cd" class="text-nowrap">{{ item.sp_cd }}</td>
+                    <td aria-describedby="list_output_dt_ymd" class="text-nowrap">{{ item.output_dt_ymd | date:
+                        'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td aria-describedby="list_input_dt_ymd" class="text-nowrap">{{ item.input_dt_ymd | date:
+                        'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td aria-describedby="list_last_yn" class="text-nowrap"><p-tag *ngIf="item.last_yn != ''"
+                            [value]=" item.last_yn" class="w-full !py-2" [severity]="getLastYNColor(item.last_yn)" />
+                    </td>
+                    <td aria-describedby="list_reg_nm" class="text-nowrap">{{ item.reg_nm }}</td>
+                    <td aria-describedby="list_chg_nm" class="text-nowrap">{{ item.chg_nm }}</td>
+                    <td aria-describedby="list_chg_dt_ymd" class="text-nowrap">{{ item.chg_dt_ymd | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
+                    <td aria-describedby="list_div_cd" class="text-nowrap">{{ item.div_cd }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+    <section class="card-2 p-[5px] pt-7 md:p-[20px] flex flex-col md:flex-row gap-2">
+        <p-floatlabel class="flex-1">
+            <input inputId="as_no_label" type="text" pInputText [(ngModel)]="description" class="w-full" />
+            <label for="over_label">{{this.valLanguage.grid_Description[this.optionLanguage]}}</label>
+        </p-floatlabel>
+        <p-button [outlined]="true" icon="pi pi-save" class="text-nowrap *:w-full" (click)="onSave()"
+            [loading]="loadingTable" [label]="this.valLanguage.btn_Save[this.optionLanguage]" severity="success" />
+    </section>
+</section>

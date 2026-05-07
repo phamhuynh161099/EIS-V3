@@ -1,0 +1,299 @@
+<section class="flex flex-col min-h-full w-full">
+        <div class="header-title">
+            <h2 class="mb-0 text-2xl sm:text-3xl mr-auto">{{this.valLanguage.CommonManagement[this.optionLanguage]}}</h2>
+        </div>
+        
+        <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+            <p-table #dt1 [scrollable]="true" scrollHeight="300px" virtualScrollItemSize="300" [loading]="loadingTable" [columns]="cols"
+                [value]="data" [showCurrentPageReport]="true" exportFilename="Common Management" [exportHeader]="'customExportHeader'"
+                [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort($event)" [customSort]="true" editMode="row" dataKey="mt_cd"
+                >
+                <ng-template #caption>
+                    <div class="pb-4 font-bold flex justify-between overflow-hidden overflow-x-auto gap-4 py-2">
+                        <p-tag severity="warn" value="{{this.valLanguage.grid_Common_Main[this.optionLanguage]}}" />
+                        <p-button icon="pi pi-plus" class="text-nowrap" label="{{this.valLanguage.btn_Add_New[this.optionLanguage]}}" (click)="onAddNew(true)" severity="warn" />
+                    </div>
+                    <div class="flex gap-4 text-nowrap overflow-x-auto pb-2 sm:pb-0">
+                        <p-button [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" [outlined]="true" icon="pi pi-filter-slash" severity="secondary" (click)="onClearTable(dt1)" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'" class="text-nowrap" [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter()"></p-button>
+                        <p-button [outlined]="true" icon="pi pi-file-excel" [label]="this.valLanguage.btn_Export[this.optionLanguage]" (click)="exportToExcelTb1()"/>
+                    </div>
+                </ng-template>
+                <ng-template #header pTemplate="header">
+                    <tr>
+                        <th colspan="2" class="text-nowrap max-w-fit">{{this.valLanguage.grid_TOTAL[this.optionLanguage]}}: {{totalRecords}}</th>
+                        <th *ngFor="let header of cols" [pSortableColumn]="header.field" class="sortable-header cursor-pointer">
+                            <div class="header-content">
+                                <span>{{header.header}}</span>
+                                <p-sortIcon [field]="header.field" />
+                            </div>
+                        </th>
+                    </tr>
+                    <tr [hidden]="isVisible">
+                            <!-- <th pFrozenColumn></th> -->
+                            <th colspan="2"></th> 
+                            @for (col of cols; track col.field) {
+                                @if (col.type == 'Text') {
+                                    <th><p-columnFilter matchMode="contains" type="text" [field]="col.field" [placeholder]="loadingTable ? 'Loading...Please wait!' : 'Type to search'" ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                                } @else if (col.type == 'Option') {
+                                    <th>
+                                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false" [showClearButton]="false">
+                                            <ng-template #filter let-value let-filter="filterCallback">
+                                                @if (col.field == 'use_yn') {
+                                                    <p-select [loading]="loadingTable" [(ngModel)]="useYNTable2FilterValue" [options]="ysList" (onChange)="filter(useYNTable2FilterValue)" optionValue="value" filterBy="label" placeholder="Select One" [showClear]="true">
+                                                        <ng-template let-option #item>
+                                                            <p-tag [value]="option.label" class="w-full" [severity]="global_sv.getUseYNColor(option.value)" />
+                                                        </ng-template>
+                                                    </p-select>
+                                                } 
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </th>
+                                }
+                            } 
+                        </tr>
+                </ng-template>
+                <ng-template #body let-information let-columns="columns" let-editing="editing" let-ri="rowIndex">
+                    <tr [pEditableRow]="information" [ngClass]="{
+                                            'even-row': ri % 2 === 0,
+                                            'odd-row': ri % 2 === 1,
+                                            'selected-row': selectedRowTb1 === ri,
+                                            'clickable-row': true
+                                        }"
+                                        (click)="onRowClickTb1(information.mt_cd, ri)">
+                        <td pFrozenColumn>
+                            <div class="flex items-center justify-center gap-2">
+                            <button *ngIf="!editing" pButton pRipple pInitEditableRow type="button" icon="pi pi-pencil"
+                                (click)="onRowEditInitTb1(information)" text rounded severity="info"></button>
+                            <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                                (click)="onRowEditSaveTb1(information)" pSaveEditableRow text rounded
+                                severity="success"></button>
+                            <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow
+                                icon="pi pi-times" (click)="onRowEditCancelTb1(information, ri)" text rounded
+                                severity="secondary"></button>
+                        </div>
+                        </td>
+                        <td aria-describedby="list_rn">{{ ri + 1 }}</td>
+                        <td *ngFor="let col of columns" class="text-nowrap">
+                            @if (col.field !== 'mt_cd') {
+                                @if (col.field == 'use_yn' ){
+                                    <p-cellEditor>
+                                        <ng-template #input>
+                                            <p-select appendTo="body" [options]="ysList" 
+                                            [(ngModel)]="information[col.field]" [loading]="loadingTable" optionValue="value" optionLabel="label" [style]="{'width':'100%'}">
+                                                <ng-template let-option #item>
+                                                    <div class="flex items-center gap-2 w-full">
+                                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getUseYNColor(option.value)" />
+                                                    </div>
+                                                </ng-template>
+                                            </p-select>
+                                        </ng-template>
+                                        <ng-template #output>
+                                            <p-tag [value]="information[col.field]" class="w-full !py-2" [severity]="global_sv.getUseYNColor(information[col.field])" />
+                                        </ng-template>
+                                    </p-cellEditor>
+                                }
+                                @else{
+                                    <p-cellEditor>
+                                        <ng-template #input>
+                                            <input pInputText type="text" [(ngModel)]="information[col.field]" class="w-full" />
+                                        </ng-template>
+                                        <ng-template #output>
+                                            {{ information[col.field] }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                }
+                            }
+                            @else {
+                                {{ information[col.field] }}
+                            }
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </section>
+
+        <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+            <p-table #dt2 [scrollable]="true" scrollHeight="300px" virtualScrollItemSize="300" [loading]="loadingDataTable2" [columns]="colsTable2"
+                [value]="dataTable2" [showCurrentPageReport]="true" exportFilename="Common Management" [exportHeader]="'customExportHeader'"
+                [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort2($event)" [customSort]="true" editMode="row" dataKey="cdid">
+                <ng-template #caption>
+                    <div class="pb-4 font-bold flex justify-between overflow-hidden overflow-x-auto gap-4 py-2">
+                        <p-tag severity="danger" value="{{this.valLanguage.grid_Common_Detail[this.optionLanguage]}}" />
+                        <p-button icon="pi pi-plus" class="text-nowrap" label="{{this.valLanguage.btn_Add_New[this.optionLanguage]}}" [disabled]="selectedMtCd == ''" [pTooltip]="selectedMtCd == '' ? this.valLanguage.Common_Management_Tooltip   [this.optionLanguage] : ''" tooltipPosition="left" (click)="onAddNew(false)" severity="danger" />
+                    </div>
+                    <div class="flex gap-4 text-nowrap overflow-x-auto pb-2 sm:pb-0">
+                        <p-button class="" [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" [outlined]="true" icon="pi pi-filter-slash" severity="secondary" (click)="onClearTable(dt2)" />
+                        <p-button [outlined]="true" [icon]="isVisible2 ? 'pi pi-unlock' : 'pi pi-lock-open'" [disabled]="recordsTable2 == 0" class="text-nowrap" [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter2()"></p-button>
+                        <p-button [outlined]="true" icon="pi pi-file-excel" [label]="this.valLanguage.btn_Export[this.optionLanguage]" [disabled]="recordsTable2 == 0" (click)="exportToExcelTb2()"/>
+                    </div>
+                </ng-template>
+                <ng-template #header pTemplate="header">
+                    <tr>
+                        <th colspan="2" class="text-nowrap max-w-fit">{{this.valLanguage.grid_TOTAL[this.optionLanguage]}}: {{recordsTable2}}</th>
+                        <th *ngFor="let header of colsTable2" [pSortableColumn]="header.field" class="sortable-header cursor-pointer">
+                            <div class="header-content">
+                                <span>{{header.header}}</span>
+                                <p-sortIcon [field]="header.field" />
+                            </div>
+                        </th>
+                    </tr>
+                    <tr [hidden]="isVisible2">
+                            <!-- <th pFrozenColumn></th> -->
+                            <th colspan="2"></th>   
+                            @for (col of colsTable2; track col.field) {
+                                @if (col.type == 'Text') {
+                                    <th><p-columnFilter matchMode="contains" type="text" [field]="col.field" [placeholder]="loadingDataTable2 ? 'Loading...Please wait!' : 'Type to search'" ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                                } @else if (col.type == 'Option') {
+                                    <th>
+                                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false" [showClearButton]="false">
+                                            <ng-template #filter let-value let-filter="filterCallback">
+                                                @if (col.field == 'use_yn') {
+                                                    <p-select [loading]="loadingDataTable2" [(ngModel)]="useYNTable2FilterValue" [options]="ysList" (onChange)="filter(useYNTable2FilterValue)" optionValue="value" filterBy="label" placeholder="Select One" [showClear]="true">
+                                                        <ng-template let-option #item>
+                                                            <p-tag [value]="option.label" class="w-full" [severity]="global_sv.getUseYNColor(option.value)" />
+                                                        </ng-template>
+                                                    </p-select>
+                                                } 
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </th>
+                                }
+                            }  
+                        </tr>
+                </ng-template>
+                <ng-template #body let-information let-columns="columns" let-editing="editing" let-ri="rowIndex">
+                    <tr [pEditableRow]="information" [ngClass]="{
+                                            'even-row': ri % 2 === 0,
+                                            'odd-row': ri % 2 === 1,
+                                            'selected-row': selectedRowTb2 === ri,
+                                            'clickable-row': true
+                                        }"
+                                        (click)="onRowClickTb2(ri)">
+                        <td pFrozenColumn>
+                            <div class="flex items-center justify-center gap-2">
+                            <button *ngIf="!editing" pButton pRipple pInitEditableRow type="button" icon="pi pi-pencil"
+                                (click)="onRowEditInitTb2(information)" text rounded severity="info"></button>
+                            <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                                (click)="onRowEditSaveTb2(information)" pSaveEditableRow text rounded
+                                severity="success"></button>
+                            <button *ngIf="editing" pButton pRipple pCancelEditableRow type="button"
+                                icon="pi pi-times" (click)="onRowEditCancelTb2(information, ri)" text rounded
+                                severity="secondary"></button>
+                        </div>
+                        </td>
+                        <td aria-describedby="list_rn">{{ ri + 1 }}</td>
+                        <td *ngFor="let col of columns" class="text-nowrap">
+                            @if (col.field !== 'mt_nm' && col.field !== 'dt_cd') {
+                                @if (col.field == 'use_yn' ){
+                                    <p-cellEditor>
+                                        <ng-template #input>
+                                            <p-select appendTo="body" [options]="ysList" 
+                                            [(ngModel)]="information[col.field]" [loading]="loadingTable" optionValue="value" optionLabel="label" [style]="{'width':'100%'}">
+                                                <ng-template let-option #item>
+                                                    <div class="flex items-center gap-2 w-full">
+                                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getUseYNColor(option.value)" />
+                                                    </div>
+                                                </ng-template>
+                                            </p-select>
+                                        </ng-template>
+                                        <ng-template #output>
+                                            <p-tag [value]="information[col.field]" class="w-full !py-2" [severity]="global_sv.getUseYNColor(information[col.field])" />
+                                        </ng-template>
+                                    </p-cellEditor>
+                                }
+                                @else{
+                                    <p-cellEditor>
+                                        <ng-template #input>
+                                            <input pInputText type="text" [(ngModel)]="information[col.field]" class="w-full" />
+                                        </ng-template>
+                                        <ng-template #output>
+                                            {{ information[col.field] }}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                }
+                            }
+                            @else {
+                                {{ information[col.field] }}
+                            }
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </section>
+
+        <div class="card-2 p-[5px] md:p-[20px] !rounded-t-none">
+            <div class="pb-4 font-bold text-sm">
+                {{this.valLanguage.btn_Add_New[this.optionLanguage]}} <p-tag [severity]="isCreTb1 ? 'warn' : 'danger'" [value]="isCreTb1 ? this.valLanguage.grid_Common_Main[this.optionLanguage] : this.valLanguage.grid_Common_Detail[this.optionLanguage]" />
+            </div>
+            @if(isCreTb1){
+                <div class="flex gap-4 flex-col md:flex-row mt-4 md:mt-0">
+                    <p-button [outlined]="true" icon="pi pi-refresh" class="text-nowrap hidden md:block" [label]="this.valLanguage.btn_Refresh[optionLanguage]" (click)="onRefresh('Main')" severity="info" />
+                    <div class="flex flex-1 md:gap-4 gap-7 flex-col md:flex-row">
+                        <div class="flex-1 flex *:w-full md:gap-4 gap-7 flex-col md:flex-row">
+                            <p-floatlabel>
+                                <input inputId="menu_nm_label" type="text" pInputText [(ngModel)]="selectedMtNm" class="w-full"  />
+                                <label for="menu_nm_label">{{this.valLanguage.grid_Main_Code_Name[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input inputId="url_label" type="text" pInputText [(ngModel)]="selectedMtExp" class="w-full"  />
+                                <label for="url_label">{{this.valLanguage.grid_Main_Code_Explain[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                        <p-floatlabel class="w-full md:w-32">
+                            <p-select inputId="use_yn_label" class="w-full" [(ngModel)]="selectedUseYN" optionValue="value" optionLabel="label"
+                                [options]="ysList" >
+                                <ng-template let-option #item>
+                                    <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getUseYNColor(option.value)" />
+                                </ng-template>
+                            </p-select>
+                            <label for="use_yn_label">{{this.valLanguage.grid_UseYN[this.optionLanguage]}}</label>
+                        </p-floatlabel>
+                    </div>
+                    <div class="flex *:flex-1 gap-4 mt-2 md:mt-0">
+                        <p-button [outlined]="true" icon="pi pi-refresh" class="text-nowrap *:w-full md:hidden" [label]="this.valLanguage.btn_Refresh[optionLanguage]" (click)="onRefresh('Main')" severity="info" />
+                        <p-button icon="pi pi-save" class="text-nowrap *:w-full" label="{{this.valLanguage.grid_Save_Common_Main[this.optionLanguage]}}" severity="success" [disabled]="loadingTable || selectedMtNm == '' || selectedMtExp == ''" (click)="onInsertCommonMain()" />
+                    </div>
+                </div>
+            }@else{
+                <div class="flex gap-4 flex-col md:flex-row mt-4 md:mt-0"> 
+                    <p-button [outlined]="true" icon="pi pi-refresh" class="text-nowrap hidden md:block" [label]="this.valLanguage.btn_Refresh[optionLanguage]" (click)="onRefresh('Detail')" severity="info" />
+                    <div class="flex flex-1 md:gap-4 gap-7 flex-col md:flex-row">
+                        <div class="flex-1 flex *:w-full md:gap-4 gap-7 flex-col md:flex-row">
+                            <p-floatlabel>
+                                <input inputId="dt_cd_label" type="text" pInputText [(ngModel)]="selectedDtCd" class="w-full"  />
+                                <label for="dt_cd_label">{{this.valLanguage.grid_Detail_Code[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input inputId="dt_nm_label" type="text" pInputText [(ngModel)]="selectedDtNm" class="w-full"  />
+                                <label for="dt_nm_label">{{this.valLanguage.grid_Detail_Code_Name[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input inputId="dt_exp_label" type="text" pInputText [(ngModel)]="selectedDtExp" class="w-full"  />
+                                <label for="dt_exp_label">{{this.valLanguage.grid_Detail_Code_Explain[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                        <p-floatlabel class="w-full md:w-32">
+                            <input inputId="dt_order_label" type="number" min="1" pInputText [(ngModel)]="selectedDtOrder" class="w-full"  />
+                            <label for="dt_order_label">{{this.valLanguage.grid_Detail_Order[this.optionLanguage]}}</label>
+                        </p-floatlabel>
+                        <p-floatlabel class="w-full md:w-32">
+                            <p-select inputId="use_yn_label" class="w-full" [(ngModel)]="selectedUseYN" optionValue="value" optionLabel="label"
+                                [options]="ysList" >
+                                <ng-template let-option #item>
+                                    <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getUseYNColor(option.value)" />
+                                </ng-template>
+                            </p-select>
+                            <label for="use_yn_label">{{this.valLanguage.grid_UseYN[this.optionLanguage]}}</label>
+                        </p-floatlabel>
+                    </div>
+                    <div class="flex *:flex-1 gap-4 mt-2 md:mt-0">
+                        <p-button [outlined]="true" icon="pi pi-refresh" class="text-nowrap *:w-full md:hidden" [label]="this.valLanguage.btn_Refresh[optionLanguage]" (click)="onRefresh('Detail')" severity="info" />
+                        <p-button icon="pi pi-save" class="text-nowrap *:w-full" label="Save Common Detail" severity="success" [disabled]="loadingDataTable2 || selectedDtCd == '' || selectedDtNm == '' || selectedDtExp == '' || selectedDtOrder < 1" (click)="onInsertCommonDetail()" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div id="addNewForm"></div>
+
+    </section>

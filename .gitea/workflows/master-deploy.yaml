@@ -1,0 +1,53 @@
+name: Deploy to PRD server
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  compile:
+    name: Call workflow compile
+    uses: ./.gitea/workflows/branch-compile.yaml
+    with:
+      profile: prod
+
+  upload:
+    needs: compile
+    name: Copy to server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ gitea.event.repository.name }}
+          path: ./dist
+
+      - name: Copy file via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ vars.HOST }}
+          username: ${{ vars.UID }}
+          password: ${{ vars.PWD }}
+          port: 22
+          command_timeout: 2m
+          strip_components: 1
+          source: ./dist/*
+          target: /data/AMS/deploy
+
+  deploy:
+    needs: upload
+    name: Backup & deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute remote SSH commands
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.HOST }}
+          username: ${{ vars.UID }}
+          password: ${{ vars.PWD }}
+          port: 22
+          script: |
+            tar -I zstd -cf /data/AMS/backup/html_$(date +"%y%m%d_%H%M").tar.zst /data/AMS/html
+            rm -rf /data/AMS/html/*
+            cp -rf /data/AMS/deploy/. /data/AMS/html
+            rm -rf /data/AMS/deploy/*

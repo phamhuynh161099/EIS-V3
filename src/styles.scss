@@ -1,0 +1,1201 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+@use './assets/layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './assets/demo/demo.scss';
+
+@media print {
+    @page {
+        size: 3in 3in;
+        padding: 0 0 -20mm 0 !important;
+        margin: 0 0 8mm 0 !important;
+        width: 150vw !important;
+        height: 100vh !important;
+    }
+
+    .style_print {
+        display: grid !important;
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+        gap: 6mm !important;
+        justify-content: center !important;
+        align-content: center !important;
+        justify-items: stretch !important;
+        background: #fff !important;
+        color: #000 !important;
+        width: 100% !important;
+    }
+
+    .style_print label {
+        font-size: 25px !important;
+        //font-size: 20px !important;
+        text-align: center !important;
+        color: #000 !important;
+        font-weight: bold;
+    }
+
+    .style_print .print-item {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-column-break-inside: avoid !important;
+    }
+}
+
+/* 1. Tăng độ rộng của thanh cuộn */
+.tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar {
+    width: 10px !important;
+    /* Tăng từ 6px lên 10px (bạn có thể tăng/giảm số này tùy ý) */
+    height: 10px !important;
+    /* Cuộn ngang nếu có */
+}
+
+/* 2. Ẩn hai nút mũi tên ở hai đầu */
+.tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-button {
+    display: none !important;
+}
+
+/* Rãnh (Track) */
+.tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 8px !important;
+}
+
+/* Tay nắm (Thumb) */
+.tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-thumb {
+    background-color: #b0bec5 !important;
+    border-radius: 8px !important;
+}
+
+.tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #90a4ae !important;
+}
+
+/* --- THÊM PHẦN NÀY CHO MOBILE (Màn hình dưới 768px) --- */
+@media screen and (max-width: 768px) {
+
+    /* Thu nhỏ thanh cuộn */
+    .tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    /* Làm mờ tay nắm (Thumb) với mã màu RGBA (độ trong suốt 40%) */
+    .tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-thumb {
+        background-color: rgba(176, 190, 197, 0.4) !important;
+    }
+
+    /* Rõ lên một chút khi người dùng chạm vào vuốt */
+    .tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-thumb:hover,
+    .tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar-thumb:active {
+        background-color: rgba(144, 164, 174, 0.7) !important;
+    }
+}
+
+
+
+// /====
+/* 1. Tăng độ rộng của thanh cuộn */
+*::-webkit-scrollbar {
+    width: 10px !important;
+    /* Tăng từ 6px lên 10px (bạn có thể tăng/giảm số này tùy ý) */
+    height: 10px !important;
+    /* Cuộn ngang nếu có */
+}
+
+/* 2. Ẩn hai nút mũi tên ở hai đầu */
+*::-webkit-scrollbar-button {
+    display: none !important;
+}
+
+/* Rãnh (Track) */
+*::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 8px !important;
+}
+
+/* Tay nắm (Thumb) */
+*::-webkit-scrollbar-thumb {
+    background-color: #b0bec5 !important;
+    border-radius: 8px !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #90a4ae !important;
+}
+
+/* --- THÊM PHẦN NÀY CHO MOBILE (Màn hình dưới 768px) --- */
+@media screen and (max-width: 768px) {
+
+    /* Thu nhỏ thanh cuộn */
+    *::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+
+    /* Làm mờ tay nắm (Thumb) với mã màu RGBA (độ trong suốt 40%) */
+    *::-webkit-scrollbar-thumb {
+        background-color: rgba(176, 190, 197, 0.4) !important;
+    }
+
+    /* Rõ lên một chút khi người dùng chạm vào vuốt */
+    *::-webkit-scrollbar-thumb:hover,
+    *::-webkit-scrollbar-thumb:active {
+        background-color: rgba(144, 164, 174, 0.7) !important;
+    }
+}
+
+/* Add application styles & imports to this file! */
+@import '~jquery-ui-pack/jquery-ui.css';
+@import '~jquery-ui-pack/jquery-ui.structure.css';
+@import '~jquery-ui-pack/jquery-ui.theme.css';
+
+@import './assets/js/paramquery/pqgrid.ui.min.css';
+@import './assets/js/paramquery/pqSelect/pqselect.min.css';
+@import './assets/js/jquery-ui-themes-1.12.0/themes/ui-darkness/theme.css';
+
+// Allow popup show on top
+.cdk-overlay-container {
+    z-index: 1401 !important;
+}
+
+// Column 1 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(1) {
+    width: 0%;
+    text-align: center;
+    padding-left: 10px;
+}
+
+// Column 2 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(2) {
+    width: 0%;
+    text-align: center;
+    padding-left: 5px;
+}
+
+// Column 3 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(3) {
+    width: 90%;
+    text-align: left;
+    padding-left: 5px;
+}
+
+// Column 4 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(4) {
+    color: #1b2831;
+    border-radius: 2px;
+}
+
+// Column 5 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(5) {
+    color: #1b2831;
+    border-radius: 2px;
+}
+
+// Column 6 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(6) {
+    transform: matrix(-1, 0, 0, 1, 0, 0);
+}
+
+// Column 7 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(7) {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+// Column 8 in footer grid
+div.pq-grid-footer table tbody tr td:nth-child(8) {
+    transform: matrix(-1, 0, 0, 1, 0, 0);
+}
+
+// Color of border every cell
+.pq-td-border-right>.pq-grid-row>.pq-grid-cell {
+    // border-top : unset !important;
+    // border-left: unset !important;
+}
+
+// Color in text editor
+.pq-editor-outer>.pq-editor-inner>textarea {
+    color: black !important;
+}
+
+tr td:nth-child(1) span select.pq-page-select option {
+    color: #1b2831;
+    background: #ffffff;
+}
+
+// General theme
+div.pq-theme * {
+    font-style: normal;
+    font-size: 11px;
+    line-height: 12px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.FacLineFilter button.select-button.placeholder {
+    background: #111425 !important;
+    color: white !important;
+}
+
+// newarticle-body
+.pq-newart-body {
+    font-size: 20px !important;
+}
+
+// Proccess in the odd row
+.pq-proc-odd {
+    background-color: #212747 !important;
+}
+
+.pq-proc-key_odd {
+    background-color: #2e3b7d !important;
+}
+
+.pq-proc-key_even {
+    background-color: #1f285c !important;
+}
+
+.pq-proc-24 {
+    background-color: #1a2036 !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 0 !important;
+    border-right: 0 !important;
+}
+
+.pq-skill_highlights_u {
+    border-top: solid 1px #808080 !important;
+}
+
+.pq-skill_highlights_l {
+    border-left: solid 1px #808080 !important;
+}
+
+.pq-skill_highlights_r {
+    border-right: solid 1px #808080 !important;
+}
+
+// Key Proccess in the odd row
+.pq-keyproc-odd {
+    background-color: #3366ff !important;
+}
+
+// Key Proccess in the even row
+.pq-keyproc-even {
+    background-color: #305496 !important;
+}
+
+// Key Proccess in the even row
+
+// Filter yellow in cell
+.pq-warning {
+    background-color: #ffc71c !important;
+    color: #111425 !important;
+}
+
+// Filter red in cell
+.pq-error {
+    background-color: #b83e44 !important;
+}
+
+// Filter orange in cell
+.pq-osc_in {
+    background-color: #fe9036 !important;
+    color: #111425 !important;
+}
+
+// Filter blue in cell
+.pq-sew_b {
+    background-color: #0090ff !important;
+}
+
+.pq-rowTotal {
+    font-weight: bold;
+    background-color: #4a5763;
+}
+
+.pq-roweven {
+    background-color: #1a1b22;
+}
+
+.pq-rowavg {
+    font-weight: bold;
+    color: #000000;
+    background-color: #afb47c;
+}
+
+.pq-total_skill_grid2 {
+    background-color: #ffaf0e !important;
+}
+
+.pq-skill-grid2-1 {
+    background-color: #0095ff !important;
+    color: #ffffff !important;
+}
+
+.pq-skill-grid2-2 {
+    background-color: #c00000 !important;
+    color: #ffffff !important;
+}
+
+.pq-skill-grid2-3 {
+    background-color: #0095ff !important;
+    color: #c00000 !important;
+}
+
+.pq-skill-grid2-4 {
+    background-color: #1a2138 !important;
+    color: #ffffff !important;
+}
+
+// First header, first col, border-bottom header of Table STATUS
+.fac_status .pq-grid-col:first-child .pq-title-span {
+    font-size: 15px !important;
+}
+
+.fac_status .pq-grid-cell:first-child div {
+    font-size: 15px;
+}
+
+.fac_status .pq-header-outer {
+    border-bottom: none;
+}
+
+// Daily Production Status
+.dailyProduction .pq-title-span {
+    font-size: 14px !important;
+}
+
+.dailyProduction .pq-body-outer .pq-grid-row .pq-grid-cell div {
+    font-size: 12px;
+}
+
+.dailyProduction .pq-summary-outer .pq-grid-row .pq-grid-cell div {
+    font-size: 17px;
+}
+
+// PO Completion Dashboard
+.grid_POD .pq-grid-header-table .pq-td-div .pq-title-span {
+    font-size: 17px !important;
+}
+
+.grid_POD .pq-grid-header-search-row .pq-grid-number-cell {
+    font-size: 17px !important;
+}
+
+.newArticle .pq-body-outer,
+.poComplete .pq-body-outer,
+// .hvcWeeklyPlan .pq-body-outer,
+.emailConfig .pq-body-outer,
+// .dday .pq-body-outer,
+.topModel .pq-body-outer {
+    height: 675px !important;
+}
+
+// First header, first col, row total, border-bottom header of Table SET.P TRACKING
+.table-tracking .pq-grid-col:first-child .pq-title-span {
+    // font-size: 15px;
+}
+
+.table-tracking .pq-grid-cell:first-child div {
+    // font-size: 15px;
+}
+
+.table-tracking .pq-grid-row:last-child .pq-grid-cell div {
+    // font-size: 15px;
+}
+
+.table-tracking .pq-header-outer {
+    border-bottom: none;
+}
+
+// First header, first col, row total, border-bottom header of Table STACK COMPLETE RATE
+.table-grid .pq-grid-col:first-child .pq-title-span {
+    font-size: 15px !important;
+}
+
+.table-grid .pq-grid-cell:first-child div {
+    font-size: 15px;
+}
+
+.table-grid .pq-grid-row:last-child .pq-grid-cell div {
+    font-size: 15px;
+}
+
+
+// test
+@keyframes example {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+// end test
+
+// class hidden footer for layout'web 2nd
+.hidden-footer {
+    display: none !important;
+}
+
+// end class hidden footer for layout'web 2nd
+
+.table-grid .pq-header-outer {
+    border-bottom: none;
+}
+
+// Title in header grid
+.pq-title-span {
+    font-weight: bold;
+    font-size: 13px !important;
+}
+
+// A column divider appears
+.pq-grid-col-leaf {
+    // border-right-color: #959595;
+    border-right: none;
+    // border-left-color : #959595 !important;
+    border-top: unset;
+    border-bottom: unset;
+}
+
+// Space betwween body grid and header 2
+div.pq-body-outer {
+    position: relative;
+}
+
+/* Border bottom of header 2.1
+.pq-cont-inner > .pq-table > .pq-grid-row {
+  border-bottom: none;
+} */
+
+// Border of textarea
+.pq-theme input[type=text],
+.pq-theme select,
+.pq-theme textarea {
+    border: none;
+}
+
+// Border between body grid and footer
+.pq-theme>.pq-grid-bottom {
+    border-top: none;
+}
+
+// Border between body grid and header
+.pq-theme>.pq-grid-top {
+    border-bottom: none;
+}
+
+// Border-bottom of header 2
+.pq-header-outer {
+    width: 100% !important;
+    border-bottom-width: 1px;
+    border-bottom-color: #1b2236 !important;
+}
+
+// Background of grid z-index: 0
+// .pq-cont-inner {
+//   background-color: #3d3f49;
+// }
+
+// tbody of footer grid
+tbody {
+    font-weight: bold;
+    font-family: Open Sans;
+    white-space: nowrap;
+}
+
+// Current page
+.pq-theme input[type='text'],
+.pq-theme select,
+.pq-theme textarea {
+    color: #1b2831;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+// Selectbox
+div.pq-theme select {
+    color: #1b2831;
+    border-radius: 2px;
+}
+
+// Footer grid
+.pq-pager {
+    background-color: #1b2831;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 0 0 2px 2px;
+}
+
+// Hide arrow near filter
+.ui-icon-arrowthick-1-s {
+    display: none !important;
+}
+
+// Button first prev page in footer grid
+.ui-icon-seek-first {
+    margin-right: -7px;
+    border-radius: 2px;
+    // background: url('../.././../assets/images/First_prev.png') center center no-repeat !important;
+    background-color: #ffffff !important;
+}
+
+// Button prev page in footer grid
+.ui-icon-seek-prev {
+    margin-right: -5px;
+    border-radius: 2px;
+    // background: url('../.././../assets/images/Prev.png') center center no-repeat !important;
+    background-color: #ffffff !important;
+}
+
+// Button next page in footer grid
+.ui-icon-seek-next {
+    margin-left: -5px;
+    border-radius: 2px;
+    // background: url('../.././../assets/images/Next.png') center center no-repeat !important;
+    background-color: #ffffff !important;
+}
+
+// Button last next page in footer grid
+.ui-icon-seek-end {
+    margin-left: -7px;
+    margin-right: 2px;
+    border-radius: 2px;
+    // background: url('../.././../assets/images/Last_next.png') center center no-repeat !important;
+    background-color: #ffffff !important;
+}
+
+// Border grid top right
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-right,
+.ui-corner-tr {
+    border-top-right-radius: 2px;
+}
+
+// Border grid top left
+.ui-corner-all,
+.ui-corner-top,
+.ui-corner-left,
+.ui-corner-tl {
+    border-top-left-radius: 2px;
+}
+
+// Border grid bot right
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-right,
+.ui-corner-br {
+    border-bottom-right-radius: 2px;
+}
+
+// Border grid bot left
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-left,
+.ui-corner-bl {
+    border-bottom-left-radius: 2px;
+}
+
+// Grid center
+.pq-grid-center {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 2px;
+    background: transparent;
+}
+
+// Column Number cell
+.pq-grid-row>.pq-grid-number-cell {
+    background-color: #4f535f;
+    text-align: center;
+    padding-top: 6px;
+    border-right: none;
+}
+
+// Border between header 1 and header 2
+.ui-widget-header {
+    border: 3px solid #111425;
+    background: transparent;
+}
+
+// Padding text all grid
+.pq-grid-cell>div,
+.pq-grid-col>div,
+.pq-grid-number-cell,
+.pq-grid-number-col {
+    padding: 3px 1px 5px;
+}
+
+// Margin text in cell
+.pq-grid-cell>div {
+    margin-left: 3px !important;
+    margin-right: 3px;
+}
+
+// Background top of header 1
+.pq-grid-title {
+    background-color: #4f535f;
+}
+
+// Background bot of header 1
+.pq-toolbar {
+    background-color: #4f535f;
+    margin-top: -10px;
+    text-align: right;
+    padding-right: 32px;
+}
+
+// Connecting bar between 2 date filters
+span.pq-from-to-center {
+    margin-top: 2px;
+}
+
+// Filter
+.pq-grid-header-search-row .pq-grid-hd-search-field {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff !important;
+    border-radius: 2px !important;
+    border: none !important;
+    height: 19px !important;
+}
+
+// Highlight cell when click edit button
+.pq-highlight {
+    background-color: gray !important;
+}
+
+// Transition cell when click edit button
+.pq-transition {
+    transition: background-color 1s !important;
+}
+
+// Unhighlight cell when click edit button
+.pq-unhighlight {
+    background-color: inherit !important;
+}
+
+// Border around the grid
+.ui-widget.ui-widget-content {
+    border: none;
+}
+
+// Background Image URL
+.ui-icon.reset {
+    // background-image: url('../../../assets/images/reset.png') !important;
+}
+
+.ui-icon.refresh {
+    // background-image: url('../../../assets/images/refresh.png') !important;
+}
+
+.ui-icon.dday {
+    // background-image: url('../../../assets/images/add-dday.png') !important;
+}
+
+.ui-icon.weekly {
+    // background-image: url('../../../assets/images/weekly-schedule.png') !important;
+}
+
+.ui-icon.export {
+    // background-image: url('../../../assets/images/export.png') !important;
+    margin-left: -2px;
+    margin-right: -8px;
+    margin-top: 1px;
+}
+
+// Style for Export button
+.export-button {
+    height: 22px !important;
+    width: 67px !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: #54d859 !important;
+    padding-top: 3px;
+    padding-left: 11px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Style for Import button
+.import-button {
+    height: 22px !important;
+    width: 67px !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: rgb(105, 105, 105) !important;
+    padding-top: 3px;
+    padding-left: 11px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Style for Save button
+.save-button {
+    height: 22px !important;
+    width: 67px !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: rgb(255, 0, 0) !important;
+    padding-top: 3px;
+    padding-left: 11px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Style for Add button
+.add-button {
+    height: 22px !important;
+    width: auto !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: #54d859 !important;
+    padding-top: 3px;
+    padding-left: 5px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Style for Delete button
+.delete-button {
+    height: 22px !important;
+    width: auto !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: rgb(105, 105, 105) !important;
+    padding-top: 3px;
+    padding-left: 5px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Style for Jantopresent button
+.jantopresent-button {
+    height: 22px !important;
+    width: 117px !important;
+    font-family: 'Open Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold !important;
+    font-size: 11px !important;
+    line-height: 15px !important;
+    text-transform: inherit !important;
+    background: rgb(127, 0, 255) !important;
+    padding-top: 3px;
+    padding-left: 11px;
+    border: none;
+    white-space: nowrap;
+}
+
+// Text editor
+div.pq-editor-outer {
+    height: 30px;
+    margin-left: 0;
+}
+
+// Cell of text editor
+div.pq-editor-inner>.pq-cell-editor {
+    height: 100% !important;
+}
+
+// Hover export button
+.export-button:focus {
+    border: 1px #59b4d4;
+}
+
+.export-button:hover {
+    background: #5498d8 !important;
+}
+
+// Css for dDay Col Selector near Export button
+.dDayColSelector {
+    height: 22px;
+    width: 136px !important;
+    background: #414141 !important;
+    border: 1px #666666 !important;
+}
+
+// Hover for dDay Col Selector near Export button
+.dDayColSelector:hover {
+    background-color: #5498d8 !important;
+}
+
+div.pq-theme.dDayColSelector {
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 15px;
+}
+
+// Style for selector PO page
+.poColSelector {
+    height: 22px;
+    width: 136px !important;
+    background: #414141 !important;
+    border: 1px #666666 !important;
+}
+
+// Hover for selector PO page
+.poColSelector:hover {
+    background-color: #5498d8 !important;
+    padding-bottom: 1px;
+}
+
+div.pq-theme.poColSelector {
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 15px;
+}
+
+.ui-button-icon-only .ui-icon {
+    margin-top: -6px !important;
+    margin-left: -6px !important;
+}
+
+.pq-theme .ui-button-icon-only {
+    width: 22px;
+    height: 22px;
+    background: #414141 !important;
+    border: 1px #666666;
+}
+
+.pq-theme .ui-button-icon-only:hover {
+    background-color: #5498d8 !important;
+}
+
+// Select Button -dDayColSelector
+div.pq-select-button {
+    text-align: right;
+    font-style: normal;
+    font-weight: bold !important;
+    text-transform: inherit;
+    padding-top: 4px;
+}
+
+// Style for Expand button(Maximum Grid)
+.pq-slider-icon {
+    top: 16px;
+    width: 22px;
+    height: 22px;
+    background: #414141;
+    border-radius: 2px;
+    border: 1px #666666;
+    margin-right: 5px;
+}
+
+// Hover for Expand button
+.pq-slider-icon:hover {
+    background-color: #5498d8 !important;
+}
+
+// Edit for Expand icon
+.ui-icon-arrow-4-diag {
+    margin-left: -2px;
+    margin-top: 2px;
+}
+
+.pq-ui-button.ui-widget-header {
+    border-radius: 2px;
+    padding: 0 4px;
+    border: 1px #666666;
+    font-size: 18px;
+    margin: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    background: transparent !important;
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+    width: 7px !important;
+    height: 7px !important;
+    position: absolute;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 6px;
+    border-radius: 2px;
+    background: #9f9f9f !important;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: #9f9f9f;
+}
+
+::-webkit-scrollbar-corner {
+    display: none;
+}
+
+body {
+    overflow-x: hidden !important;
+}
+
+// Filter button
+.pq-filter-icon {
+    // background-image: url('../../../assets/images/icon_filter.png');
+    border-radius: 2px;
+    background-color: #ececec;
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 19px;
+    background-position: center;
+}
+
+// Icon in filter button
+.pq-filter-icon,
+.pq-menu-icon {
+    position: absolute;
+    top: 3px;
+    right: 1px;
+    opacity: 1;
+}
+
+.pq-popup {
+    background: linear-gradient(180deg, #5e5e5e 0%, #86909b 100%);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    border: none;
+}
+
+// Separator of grid
+.pq-theme span.pq-separator {
+    height: 14px;
+}
+
+button:focus {
+    outline: #959595 !important;
+}
+
+// Delete border right of Number column
+.pq-body-outer .pq-cont-left {
+    border-right: none;
+}
+
+// Background for disable Cancel button
+.ui-state-disabled,
+.ui-widget-content .ui-state-disabled,
+.ui-widget-header .ui-state-disabled {
+    background: #8e8b8b;
+}
+
+// Style for Edit button D-Day Tracking
+.ui-button {
+    width: 79px;
+    background: linear-gradient(180deg, #5e5e5e 0%, #86909b 100%);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    border: none;
+}
+
+// Hover for Edit- Update button - D-Day tracking
+.ui-button:hover {
+    background: #5498d8 !important;
+    border: none;
+}
+
+// Link to new Edit icon
+.ui-icon-pencil {
+    // background: url('../.././../assets/images/edit_icon.png') center center no-repeat !important;
+}
+
+.ui-widget-content {
+    border: 1px solid #666666;
+    background: #4f535f;
+}
+
+// Set width for select box
+.pq-select-menu {
+    // width: 135px;
+    width: 100%;
+}
+
+// Search icon in select-box
+.pq-select-search-div>.ui-icon {
+    float: left;
+}
+
+// Remove border between Select-all and check-list
+.pq-select-search-div {
+    border: none;
+    margin-bottom: 0;
+}
+
+// Set background, text color for select header
+.pq-select-all {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    background: #ffffff;
+    border: none;
+    color: black;
+    font-weight: bold !important;
+}
+
+// Set background, text color for select box
+.pq-select-popup {
+    background: #1a2036 !important;
+    // color     : #bdbdbd;
+    color: white;
+    margin-top: 3px;
+    width: 200px;
+}
+
+.pq-select-option-label,
+.pq-state-select,
+.ui-state-highlight,
+.ui-state-enable {
+    background: #1a2036 !important;
+    // color     : #bdbdbd;
+    color: white;
+    margin-top: 3px;
+    width: 200px;
+}
+
+// Set Width for Selecter Scrollbar
+.pq-select-popup> ::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pq-left-input {
+    font-weight: bold;
+}
+
+// Delete border between lines
+div.pq-select-menu>.pq-select-option-label {
+    border: none;
+}
+
+// Radio color
+.pq-theme input[type=checkbox],
+.pq-theme input[type=radio] {
+    top: 0;
+}
+
+// Hover option filter
+.ui-state-hover,
+.ui-widget-content .ui-state-hover:hover {
+    background: #5498d8;
+}
+
+// Popop filter
+.pq-popup * {
+    border: none;
+    border-right: unset !important;
+    border-bottom: unset !important;
+}
+
+// Title filter
+.pq-popup * .pq-title-span {
+    margin-left: 2px;
+}
+
+// Body filter
+.pq-popup * .pq-body-outer {
+    margin-top: 5px !important;
+    border-top: 1px solid white;
+}
+
+// Cell in filter
+.pq-popup * .pq-grid-cell {
+    border-right: none;
+    padding-top: 1px;
+}
+
+// Title filter
+.pq-popup * .pq-grid-title-row {
+    margin-top: 3px;
+}
+
+// Hover on NumberCell
+.ui-state-hover,
+.ui-widget-content .ui-state-hover {
+    background: #5498d8;
+}
+
+// Remove color of NumberCell in popup filter
+.pq-popup * .pq-grid-number-cell {
+    background: #3d3f49 !important;
+    padding-top: 5px;
+}
+
+// Edit text No in NumberCell on Header
+.pq-grid-header-search-row .pq-grid-number-cell {
+    margin-top: -28px;
+    background: #3f424c;
+    font-weight: bold;
+    font-size: 13px !important;
+}
+
+// Background of grid New, PO, DDay
+.general {
+    background: transparent;
+}
+
+// Background of grid center New, PO, DDay
+.general .pq-grid-center {
+    background: #4f535f;
+}
+
+.pq-select-search-input {
+    background-color: #f0f7fa;
+    border: 0.5px solid #e0e0e0;
+    height: 25px;
+}
+
+.pq-select-search-div>.ui-icon {
+    width: 128px;
+}
+
+// Select option Top Model Setup
+.pq-select-single .pq-select-item-text,
+.pq-select-single .pq-select-text {
+    max-width: 85px !important;
+}
+
+// Resize Select option search Top Model Setup
+.pq-select-search-div>.ui-icon {
+    margin-left: -3px;
+    height: 25px;
+}
+
+// Resize search in select option Top Model Setup
+.ui-icon.ui-icon-search {
+    width: 100%;
+}
+
+// Hover select option list Top Model Setup
+.pq-select-popup label.pq-state-hover {
+    color: white;
+    background: #5498d8;
+}
+
+// Click row highlight row Daily Production Status page
+.pq-state-select.pq-grid-row {
+    color: orange;
+}

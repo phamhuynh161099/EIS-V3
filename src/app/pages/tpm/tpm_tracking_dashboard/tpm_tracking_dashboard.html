@@ -1,0 +1,139 @@
+<p-toast />
+<p-confirmdialog />
+<section class="bg-red-300 overflow-y-scroll custom-main-wrapper bg-white p-2 space-y-2"
+    [style.minHeight.px]="boxHeight()">
+
+    <section id="block-filter" class="w-full">
+        <div class="relative rounded-2xl border border-gray-light bg-white p-4 shadow-md">
+
+            <div class="flex flex-wrap items-center gap-3 pr-12">
+
+                <div>
+                    <p class="uppercase text-3xl font-bold text-slate-600">Tracking Tickit Request Dashboard</p>
+                </div>
+
+                <div>
+                    <p-select [options]="arrType" [(ngModel)]="selectedType" placeholder="Select Workshop"
+                        styleClass="custom-workshop-dropdown h-[48px] w-[200px] align-items-center" size="large" (onChange)="onWorkshopChange($event)">
+                    </p-select>
+                </div>
+
+            </div>
+
+            <div class="mt-2 flex justify-end border-t border-gray-light pt-3">
+                <div class="flex flex-wrap items-center gap-3 pr-12">
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section id="block-table" class="mx-auto !rounded-2xl shadow-lg p-2 border border-gray-light"
+        [style.height.px]="boxHeightTable()" style="position: relative;overflow: auto;">
+        <div class="iot-dashboard-light">
+
+            <div class="monitor-panel shadow-2xl">
+                <div class="panel-header">
+                    <!-- <div class="header-title">
+                        <i class="pi pi-server text-red-600"></i>
+                        <span>{{ groupData().groupName }}</span>
+                    </div> -->
+                    <div class="header-badge">
+                        MP {{ groupData().mp }}
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+
+                    <div class="line-grid">
+                        @for (line of groupData().lines; track line.line_name) {
+
+                        <div class="line-card" [ngClass]="'status-' + line.status">
+
+                            <div class="card-top">
+                                <span class="line-id">{{ line.line_name }}</span>
+                                <div class="status-icon">
+                                    @if (line.status === 'error') {
+                                    <i class="pi pi-exclamation-triangle"></i>
+                                    } @else if (line.status === 'fixing') {
+                                    <i class="pi pi-cog spin-anim"></i>
+                                    } @else if (line.status === 'normal') {
+                                    <i class="pi pi-check-circle"></i>
+                                    } @else {
+                                    <i class="pi pi-minus-circle"></i>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="card-metrics-time">
+                                @if (line.engineerName) {
+                                <div class="time-row">
+                                    <i class="pi pi-user time-icon"></i>
+                                    <div class="time-info">
+                                        <!-- <span class="time-label">Call:</span> -->
+                                        <span class="time-value">{{ line.engineerName }}</span>
+                                    </div>
+                                </div>
+                                }
+
+                                @if (line.initTime) {
+                                <div class="time-row">
+                                    <i class="pi pi-spin pi-spinner time-icon"></i>
+                                    <div class="time-info">
+                                        <!-- <span class="time-label">Call:</span> -->
+                                        <span class="time-value">{{ line.initTime }}</span>
+                                    </div>
+                                </div>
+                                }
+
+                                @if (line.requestTime) {
+                                <div class="time-row">
+                                    <i class="pi pi-phone time-icon"></i>
+                                    <div class="time-info">
+                                        <!-- <span class="time-label">Call:</span> -->
+                                        <span class="time-value">{{ line.requestTime }}</span>
+                                    </div>
+                                </div>
+                                }
+
+                                @if (line.acceptTime) {
+                                <div class="time-row">
+                                    <i class="pi pi-wrench time-icon"></i>
+                                    <div class="time-info">
+                                        <!-- <span class="time-label">Nhận:</span> -->
+                                        <span class="time-value">{{ line.acceptTime }}</span>
+                                    </div>
+                                </div>
+                                }
+
+                                @if (!line.initTime && !line.requestTime && !line.acceptTime) {
+                                <div class="time-empty">
+                                    <span>-- : --</span>
+                                </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                        } @empty {
+                        <div class="empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <p>Chưa có dữ liệu ESP</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+
+</section>

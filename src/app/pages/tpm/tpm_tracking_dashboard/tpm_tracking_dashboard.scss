@@ -1,0 +1,402 @@
+h2,
+p {
+    margin: 0;
+}
+
+/* 1. Tăng độ rộng của thanh cuộn */
+.custom-main-wrapper::-webkit-scrollbar {
+    width: 10px;
+    /* Tăng từ 6px lên 10px (bạn có thể tăng/giảm số này tùy ý) */
+    height: 10px;
+    /* Cuộn ngang nếu có */
+}
+
+/* 2. Ẩn hai nút mũi tên ở hai đầu */
+.custom-main-wrapper::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Rãnh (Track) */
+.custom-main-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 8px;
+}
+
+/* Tay nắm (Thumb) */
+.custom-main-wrapper::-webkit-scrollbar-thumb {
+    background-color: #b0bec5;
+    border-radius: 8px;
+}
+
+.custom-main-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #90a4ae;
+}
+
+/* --- THÊM PHẦN NÀY CHO MOBILE (Màn hình dưới 768px) --- */
+@media screen and (max-width: 768px) {
+
+    /* 1. Chỉnh nhỏ thanh cuộn lại (ví dụ: 4px) */
+    .custom-main-wrapper::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    /* 2. Làm mờ tay nắm (Thumb) bằng cách dùng mã màu RGBA thay vì HEX */
+    .custom-main-wrapper::-webkit-scrollbar-thumb {
+        /* Chuyển mã #b0bec5 sang rgba và set độ trong suốt là 0.4 (40%) */
+        background-color: rgba(176, 190, 197, 0.4);
+    }
+
+    /* 3. (Tùy chọn) Khi người dùng chạm vào trên mobile thì rõ lên một chút */
+    .custom-main-wrapper::-webkit-scrollbar-thumb:hover,
+    .custom-main-wrapper::-webkit-scrollbar-thumb:active {
+        background-color: rgba(144, 164, 174, 0.7);
+    }
+}
+
+
+/* Custom toàn bộ khu vực header của Dialog */
+::ng-deep .p-dialog .p-dialog-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.5rem 1.5rem;
+}
+
+/* Custom riêng cái chữ (Text) bên trong Header */
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+    color: #1e293b;
+    /* Màu chữ đậm (slate-800) */
+    font-size: 1.25rem;
+    /* Chữ to hơn */
+    font-weight: 700;
+    /* In đậm */
+}
+
+// =============================
+/* --- Cấu hình Light Mode --- */
+.iot-dashboard-light {
+    padding: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.monitor-panel {
+    background-color: #ffffff;
+    border-radius: 8px;
+    // border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    // max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header mượt hơn, không bị khối đỏ rực cồng kềnh */
+.panel-header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 0;
+
+        .text-red-600 {
+            color: #dc2626;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+    }
+
+    .header-badge {
+        background-color: #f1f5f9;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+    }
+}
+
+.panel-body {
+    padding: 1.5rem;
+}
+
+
+
+/* Thẻ Card Grid */
+.line-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.line-card {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 1rem;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #e2e8f0;
+    /* Dùng viền trái siêu dày để báo trạng thái giống các tool tracking xịn */
+    border-left-width: 5px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 5px;
+
+        .line-id {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .status-icon i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .card-metrics {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+
+        .main-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .sub-values {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+    }
+}
+
+/* --- Tương phản màu sắc cho từng trạng thái --- */
+/* 1. Bình thường (Xanh lá) */
+.status-normal {
+    background-color: #f0fdf4;
+    border-left-color: #22c55e;
+    border-color: #bbf7d0;
+
+    .line-id {
+        color: #166534;
+    }
+
+    .status-icon {
+        color: #22c55e;
+    }
+
+    .main-value {
+        color: #14532d;
+    }
+
+    .sub-values {
+        color: #15803d;
+    }
+}
+
+/* 2. Lỗi / Đã gọi Engineer (Đỏ) */
+.status-error {
+    background-color: #fef2f2;
+    border-left-color: #ef4444;
+    border-color: #fecaca;
+
+    .line-id {
+        color: #991b1b;
+    }
+
+    .status-icon {
+        color: #ef4444;
+    }
+
+    .main-value {
+        color: #7f1d1d;
+    }
+
+    .sub-values {
+        color: #b91c1c;
+    }
+}
+
+/* 3. Đang sửa (Cam) */
+.status-fixing {
+    background-color: #fff7ed;
+    border-left-color: #f97316;
+    border-color: #fed7aa;
+
+    .line-id {
+        color: #9a3412;
+    }
+
+    .status-icon {
+        color: #f97316;
+    }
+
+    .main-value {
+        color: #7c2d12;
+    }
+
+    .sub-values {
+        color: #c2410c;
+    }
+}
+
+/* 4. Chưa gán ESP (Trắng/Xám) */
+.status-unassigned {
+    background-color: #f8fafc;
+    border-left-color: #94a3b8;
+    border-color: #e2e8f0;
+
+    .line-id {
+        color: #475569;
+    }
+
+    .status-icon {
+        color: #94a3b8;
+    }
+
+    .main-value {
+        color: #1e293b;
+    }
+
+    .sub-values {
+        color: #64748b;
+    }
+}
+
+/* --- Layout cho thời gian --- */
+.card-metrics-time {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Khoảng cách giữa 2 dòng thời gian */
+  margin-top: 12px;
+
+  .time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Nền trong suốt nhẹ giúp dòng thời gian tách biệt khỏi nền thẻ */
+    background-color: rgba(0, 0, 0, 0.04);
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .time-icon {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .time-info {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+
+    .time-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+
+    .time-value {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      font-family: monospace; /* Dùng font monospace cho số để các giờ (như 10:00 và 11:11) thẳng hàng nhau */
+    }
+  }
+
+  .time-empty {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.4;
+    padding: 4px 0;
+    font-family: monospace;
+  }
+}
+
+/* Đảm bảo màu chữ của thời gian ăn theo màu của trạng thái thẻ (kế thừa từ class status-xxx) */
+.status-error .time-row { background-color: rgba(239, 68, 68, 0.1); }
+.status-fixing .time-row { background-color: rgba(249, 115, 22, 0.1); }
+.status-normal .time-row { background-color: rgba(34, 197, 94, 0.1); }
+
+/* Animations */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spin-anim {
+    animation: spin 3s linear infinite;
+}
+
+
+// Custom P-Dropdown
+/* Tùy chỉnh p-dropdown thành dạng thẻ (card) */
+::ng-deep .custom-workshop-dropdown.p-select {
+    background-color: #ffffff;
+    /* Xóa viền mặc định của PrimeNG */
+    // border: 1px solid transparent !important;
+    border-radius: 8px !important;
+
+    /* Tạo hiệu ứng bóng mờ và viền dưới dày giống trong hình */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 2px 4px -2px rgba(0, 0, 0, 0.05),
+                0 2px 0 0 rgba(148, 163, 184, 0.3) !important;
+
+    transition: all 0.2s ease;
+    padding: 2px 4px; /* Làm cho thẻ to ra một chút */
+
+    /* Bỏ focus ring màu xanh mặc định, đổi thành viền nhẹ */
+    &.p-focus {
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 0 0 2px rgba(226, 232, 240, 0.5),
+                    0 2px 0 0 rgba(148, 163, 184, 0.3) !important;
+    }
+
+    /* Chỉnh lại padding bên trong để căn giữa chữ và icon */
+    .p-dropdown-label {
+        padding: 0.75rem 1rem !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .p-select-label {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    /* Mũi tên xổ xuống */
+    .p-dropdown-trigger {
+        width: 2.5rem;
+        color: #94a3b8;
+    }
+}

@@ -1,0 +1,268 @@
+<div class="card-2 py-2 lg:p-5">
+    <p-toast position="top-center" />
+    <div class="mr-auto block md:justify-between  md:flex">
+        <div class=" flex">
+            <h4 class="text-2xl ml-3 sm:text-3xl">{{ valLanguage.nameBarScanner[optionLanguage] }}</h4>
+            <p-button class="ml-3" label="" severity="secondary" [outlined]="true" icon="pi pi-refresh"
+                      (click)="refresh()" />
+        </div>
+        <div class="justify-end flex">
+            <p-button [class]="flagBarcode? 'mx-2': 'mx-2'" [label]="valLanguage.btn_Camera[optionLanguage]"
+                      [severity]="flagBarcode ? 'secondary':'success'" (click)="scannerCamera()" />
+            <p-button [class]="flagBarcode? 'mx-2': 'mx-2'" [label]="valLanguage.btn_PDAScanner[optionLanguage]"
+                      [severity]="flagBarcode ? 'success':'secondary'" (click)="barcodeScanner()" />
+        </div>
+    </div>
+    <div
+        [class]="flagBarcode ? 'grid  grid-flow-col grid-rows-3 grid-cols-4 gap-4  m-4 *:border *:border-[var(--p-primary-color)] *:rounded-md':'grid  grid-flow-col grid-rows-4 grid-cols-4 gap-4  m-4 *:border *:border-[var(--p-primary-color)] *:rounded-md'">
+        <div [class]="flagBarcode ? 'hidden' : 'box p-3 xl:p-10 col-start-1 col-span-4 xl:col-span-2 row-span-4  ... '"
+             pRipple>
+            <!-- barcode ngx-barcode-scanner -->
+            <!-- <div class="flex justify-center w-full mb-6 scanner">
+                <p-button [class]="flagBarcode? 'mx-2': 'mx-2'" [label]="valLanguage.btn_Camera_QR[optionLanguage]"
+                [severity]="flagCameraQR_Bar ? 'info':'secondary'" (click)="scannerCameraQR()" />
+            <p-button [class]="flagBarcode? 'mx-2': 'mx-2'" [label]="valLanguage.btn_Camera_Bar[optionLanguage]"
+                [severity]="flagCameraQR_Bar ? 'secondary':'info'"  (click)="scannerCameraBar()" />
+            </div> -->
+            <div class="flex justify-center w-full mb-6 scanner">
+                <div *ngIf="avatarURL" class="">
+                    <p-image [src]="avatarURL" height="200" alt="Image" width="250" />
+                    <label>{{ file_open }}</label>
+                </div>
+
+                <!-- Scanner QR Code  flagCameraQR_Bar flagImageScanner -->
+                <p-button *ngIf="flagImageScanner && !avatarURL && flagCameraQR_Bar" icon="pi pi-qrcode"
+                          [rounded]="true" severity="success"
+                          class="qr-result" [outlined]="true" />
+                <zxing-scanner *ngIf="!flagImageScanner && !avatarURL && flagCameraQR_Bar" #scanner
+                               (camerasFound)="onCamerasFound($event)"
+                               [device]="selectedDevice" [formats]="allowedBarcodeFormats"
+                               (scanSuccess)="onScanSuccess($event)"></zxing-scanner>
+
+                <!-- Scanner Bar coder  -->
+                <!-- barcode ngx-barcode-scanner -->
+                <!-- <ngx-barcode-scanner *ngIf="avatarURL === null && !flagCameraQR_Bar" [(value)]="valueBar_Code"
+                    [codes]="['code_128', 'ean', 'upc', 'upc_e', 'ean_8']" [errorThreshold]="0.1"
+                    (exception)="onError($event)" (valueChange)="onBarcodeScanned($event)"></ngx-barcode-scanner> -->
+            </div>
+
+            <div class="flex flex-col md:flex-row flex-wrap w-fit mx-auto justify-center gap-x-4 gap-y-2">
+                <div class="flex justify-between w-[17rem]">
+                    <p-button [label]="valLanguage.btn_CameraScanner[optionLanguage]" severity="contrast"
+                              class="camera-scanner row-auto flex-1 *:w-full rounded-md">
+                        <i class="pi pi-camera"></i>
+                        <select [(ngModel)]="selectedCamera" style="width: '100%'; padding: 1px; color:#fff"
+                                class="p-inputtext p-component" (change)="onDeviceChange($event)">
+                            <option value="" [selected]="!selectedDevice">Choose</option>
+                            <option *ngFor="let device of availableDevices" [value]="device.deviceId">{{ device.label }}
+                            </option>
+                        </select>
+                    </p-button>
+                </div>
+                <div class="flex justify-between w-[17rem]">
+                    <p-button [label]="valLanguage.btn_QRChoose[optionLanguage]" severity="contrast"
+                              class="qr-choose row-auto flex-1 *:w-full rounded-md">
+                        <i class="pi pi-folder-open"></i>
+                        <input id="file_input_qr" style="width: 90px;" type="file" (change)="onFileSelected($event)" />
+                    </p-button>
+                </div>
+            </div>
+        </div>
+        <div
+            [class]="flagBarcode ? 'col-start-1 col-span-4 p-3 row-span-1 ...' : 'col-start-1 xl:col-start-3 p-3 col-span-4 xl:p-10  xl:col-span-2 row-span-2 ...'"
+            pRipple>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center">
+                    <p-radiobutton name="ingredient" value="single" [(ngModel)]="ingredient"
+                                   (click)="changeRadioMullti('single')" inputId="ingredient1" />
+                    <label for="ingredient1" class="ml-2">{{ valLanguage.radio_Single[optionLanguage] }}</label>
+                </div>
+
+                <div class="flex items-center">
+                    <p-radiobutton name="ingredient" [value]="multiple" [(ngModel)]="ingredient"
+                                   (click)="changeRadioMullti(multiple)" inputId="ingredient2" />
+                    <label for="ingredient2" class="ml-2">{{ valLanguage.radio_Multiple[optionLanguage] }}</label>
+                </div>
+                <div *ngIf="ingredient===multiple">Scanned: {{ multipleScanResults.length }}</div>
+                <!-- barcode ngx-barcode-scanner -->
+                <!-- <div *ngIf="flagScannerReset" class="flex items-center">
+                    <p-button class="ml-3" [label]="valLanguage.btn_ScannerBarReset[optionLanguage]" severity="secondary"
+                        [outlined]="true" icon="pi pi-refresh" (click)="onStartButtonPress()" />
+                </div> -->
+
+            </div>
+            <div *ngIf="ingredient === multiple"
+                 class="border border-[var(--p-primary-color)] rounded-md flex flex-wrap items-end gap-4 mb-3 box p-5 pt-3 mt-2">
+                <p-floatlabel class="w-full sm:w-40 mt-4">
+                    <p-select class="w-full" [(ngModel)]="corpFilterValue" (onChange)="handleChangeCorp($event)"
+                              [disabled]="true"
+                              [options]="corpFac" [showClear]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2"
+                                   [severity]="global_sv.getCorpColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="username">{{ valLanguage.grid_Corp[this.optionLanguage] }}</label>
+                </p-floatlabel>
+                <p-floatlabel class="w-full sm:w-40 mt-4">
+                    <p-select class="w-full" [(ngModel)]="statusFilterValue" [options]="status" [showClear]="true"
+                              appendTo="body">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2"
+                                   [severity]="global_sv.getStatusColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="username">{{ valLanguage.grid_Status[this.optionLanguage] }}</label>
+                </p-floatlabel>
+                <p-floatlabel class="w-full sm:w-60 mt-4" #storageAnchorFilter>
+                    <p-select class="w-full" [(ngModel)]="storageFilterValue" [filter]="true" filterBy="label"
+                              [options]="storage" [showClear]="true" appendTo="body"
+                              [showClear]="true" [autoOptionFocus]="false" [autofocusFilter]="false" filter
+                              filterBy="label"
+                              (onShow)="onSelectPanelShow(storageAnchorFilter.el.nativeElement)"
+                              (onHide)="onSelectPanelHide()">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                        </ng-template>
+                    </p-select>
+                    <label for="username">{{ valLanguage.grid_Storage[this.optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+            <div *ngIf="ingredient === multiple" class="*:w-full *:md:w-40 *:*:w-full flex flex-wrap gap-4">
+                <p-button [label]="valLanguage.btn_Clear[this.optionLanguage]" severity="secondary" [outlined]="true"
+                          icon="pi pi-filter-slash" (click)="clearFile()" />
+                <p-button [outlined]="true" severity="danger" icon="pi pi-save"
+                          [label]="valLanguage.btn_Save[this.optionLanguage]" (click)="saveMultiple()"></p-button>
+            </div>
+        </div>
+
+        <div
+             [class]="flagBarcode ? 'col-start-1 p-3 xl:p-10 col-span-4 row-span-2  ...' : 'col-start-1 xl:col-start-3 p-3 xl:p-10 col-span-4 xl:col-span-2 row-span-2  ...'"
+             pRipple>
+
+            <div *ngIf="flagBarcode" class="mb-2">
+                <textarea
+                    id="scanResultTexInputHidden"
+                    #scanResultTexInputHidden
+                    pTextarea
+                    inputmode="none"
+                    [(ngModel)]="valueBarcodeHidden"
+                    (input)="onTextareaValueChange($event)"
+                    placeholder="Click here then scan..."
+                    class="w-full cursor-pointer max-h-10 py-0! *:border-4!"
+                    style="resize: none; width: 100%"
+                ></textarea>
+            </div>
+            <!--            <label [class]="flagBarcode ? 'w-full' : 'hidden'">{{-->
+            <!--                    valLanguage.text_Focus_Scanner[this.optionLanguage]-->
+            <!--                }}</label>-->
+            <!--            <label class="w-full">{{ valLanguage.txt_ScanResuft[this.optionLanguage] }}</label>-->
+            <!--            <textarea [disabled]="isTextareaCameraDisabled" [class]="flagBarcode ? 'hidden': 'w-full mt-2 h-4/5 !pt-2'"-->
+            <!--                      rows="5" cols="30" pTextarea [(ngModel)]="value"></textarea>-->
+
+            <div *ngIf="ingredient===multiple" class="sm:flex sm:justify-center">
+                <p-orderlist [value]="multipleScanResults" filterBy="mt_cd" filterPlaceholder="Filter by material code"
+                             [responsive]="true" breakpoint="575px" scrollHeight="30rem" class="w-full border-none p-0">
+                    <ng-template let-option let-selected="selected" #item>
+                        <div class="flex flex-col md:flex-row items-center p-1 gap-4 w-full"
+                             (dblclick)="handleRemoveSelected(option.emno)">
+                            <span class="font-medium text-sm text-nowrap md:mr-4">{{ option.mt_cd }}</span>
+                            <div class="flex md:ml-auto w-full justify-between gap-x-2 text-xs items-center">
+                            <span
+                                [ngClass]="{
+                                    'text-sm': true,
+                                    'text-surface-500': !selected,
+                                    'dark:text-surface-400': !selected,
+                                    'text-inherit': selected
+                                }"
+                            >{{ option.factory_nm }}</span>
+                                <p-tag *ngIf="option.sts_nm" [value]="option.sts_nm" class="!py-2 w-20"
+                                       [severity]="global_sv.getStatusColor(option.sts_nm)" />
+
+                                <p-tag *ngIf="!option.sts_nm" value="empty" class="!py-2 w-20"
+                                       severity="danger" />
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-orderlist>
+            </div>
+
+
+            <!--            <textarea #scanResultTextarea inputmode="none" [disabled]="isTextareaDisabled" [(ngModel)]="valueBarcode"-->
+            <!--                      [class]="flagBarcode ? 'w-full mt-2 h-2/4 !pt-2' : 'hidden'" rows="5" cols="30"-->
+            <!--                      pTextarea></textarea>-->
+
+        </div>
+    </div>
+
+    <div *ngIf="isShowScanOneInfo" class="rounded box m-4"
+         style="border: 1px solid rgba(75, 175, 80, 0.3); --p-ripple-background: rgba(75, 175, 80, 0.3)">
+        <h4 class="pl-5 pt-3">{{ valLanguage.txt_MachineInfo[this.optionLanguage] }}</h4>
+        <div
+            class="rounded gap-x-4 gap-y-7 mb-3 box px-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 *:max-w-xs *:w-full *:mx-auto">
+            <input placeholder="Asset No" pInputText [disabled]="true" [(ngModel)]="asset_no" />
+            <input placeholder="Material Code" pInputText [disabled]="true" [(ngModel)]="material_code" />
+            <input placeholder="Material Name" pInputText [disabled]="true" [(ngModel)]="material_name" />
+            <input placeholder="Model" pInputText [disabled]="true" [(ngModel)]="model" />
+            <div #statusAnchor>
+                <p-floatlabel>
+                    <p-select class="w-full" [(ngModel)]="statusScannerValue" [options]="status" appendTo="body"
+                              [showClear]="true" [autoOptionFocus]="false" [autofocusFilter]="true">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" class="w-full !py-2"
+                                   [severity]="global_sv.getStatusColor(option.label)" />
+                        </ng-template>
+                    </p-select>
+                    <label for="username">{{ valLanguage.Status[this.optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+        </div>
+        <h4 class="pl-5 pt-3">{{ valLanguage.grid_Location[this.optionLanguage] }}</h4>
+        <div
+            class="rounded gap-x-4 gap-y-7 mb-3 box px-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 *:max-w-xs *:w-full *:mx-auto">
+            <input placeholder="Corp Name" pInputText [disabled]="true" [(ngModel)]="corp" />
+            <div #storageAnchor>
+                <p-floatlabel>
+                    <p-select class="w-full" down arrow [(ngModel)]="storageScannerValue" [options]="storage"
+                              appendTo="body"
+                              [showClear]="true" [autoOptionFocus]="false" [autofocusFilter]="false" filter
+                              filterBy="label"
+                              (onShow)="onSelectPanelShow(storageAnchor)" (onHide)="onSelectPanelHide()">
+                        <ng-template let-option #item>
+                            <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                        </ng-template>
+                    </p-select>
+                    <label for="username">{{ valLanguage.txt_Storage[this.optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+        </div>
+
+        <div
+            class="rounded gap-4 mb-3 box px-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 *:max-w-xs *:w-full *:mx-auto *:*:w-full">
+            <p-button label="Clear Scanner" severity="secondary" [outlined]="true" icon="pi pi-filter-slash"
+                      (click)="clearScanner()" />
+            <p-button [outlined]="true" severity="danger" icon="pi pi-save" label="Save Scanner"
+                      (click)="saveScanner()"></p-button>
+        </div>
+    </div>
+
+    <p-dialog header="Not Found!" [(visible)]="isOpenDialog" modal dismissableMask resizable draggable>
+        <div class="text-center">
+            <div class="mt-2">This material code does not exist in the database.</div>
+            <div class="mt-2">Would you like to create a new one using this material code ?</div>
+            <div class="mt-7 mb-10 font-semibold text-lg">{{ mt_cd_not_existed }}</div>
+        </div>
+        <div class="flex gap-2 items-center justify-center *:w-full *:*:w-full">
+            <p-button label="Cancel" severity="secondary" (click)="onCloseDialog()" />
+            <p-button label="Create New" (click)="onOpenCreateDialog()" />
+        </div>
+    </p-dialog>
+
+
+    <dialog-create-information (parentFun)="fetchData()" (changeHideDialog)="changeHideDialog(event)"
+                               [corpList]="corpFac" [storageList]="storage"
+                               [listMtCd]="listMtCd"
+                               [informationCreateDialog]="informationCreateDialog" [valLanguage]="valLanguage"
+                               [optionLanguage]="optionLanguage" [setInfo]="{mt_cd: mt_cd_not_existed}"
+                               (parentCreateDone)="onCreateDone()" />
+</div>

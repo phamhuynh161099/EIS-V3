@@ -1,0 +1,237 @@
+<section>
+    <p-toast />
+    <p-confirmdialog />
+    <div class="card header-title">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3 xl:mb-0">
+            <h2 class="text-2xl sm:text-3xl mr-auto">
+                {{ valLanguage.nameSupplierInformation[this.optionLanguage] }}
+                <p-progress-spinner *ngIf="loading_full" class="spinner-cl pl-3" strokeWidth="5" fill="transparent"
+                                    animationDuration=".5s"
+                                    [style]="{ width: '20px', height: '20px', color: '#333' }" />
+            </h2>
+            <div class="flex gap-2 *:w-[120px] *:*:w-full ml-auto">
+                <p-button [label]="valLanguage.btn_Refresh[optionLanguage]" severity="secondary" icon="pi pi-refresh"
+                          (click)="ngOnInit()" />
+                <p-button severity="info" variant="outlined" icon="pi pi-search"
+                          [label]="valLanguage.btn_Search[optionLanguage]" (click)="filterChooseSearch()" />
+            </div>
+        </div>
+        <div class="rounded flex *:w-full *:max-w-80 gap-x-4 box p-5 header-border-filter">
+            <p-floatlabel>
+                <input class="w-full" id="code" pInputText [(ngModel)]="codeFilterValue" />
+                <label for="code">{{ this.valLanguage.grid_Code[optionLanguage] }}</label>
+            </p-floatlabel>
+
+            <p-floatlabel>
+                <input class="w-full" id="model_filter" pInputText [(ngModel)]="nameFilterValue" />
+                <label for="username">{{ this.valLanguage.grid_Name[optionLanguage] }}</label>
+            </p-floatlabel>
+        </div>
+    </div>
+    <p-toast />
+    <div class="card">
+        <p-table
+            #dt1
+            [value]="dataTable"
+            class="table_minheight"
+            scrollHeight="626px"
+            virtualScrollItemSize="626"
+            (sortFunction)="customSort($event)"
+            [customSort]="true"
+            exportFilename="QR Code Management"
+            dataKey="spno"
+            showGridlines
+            [tableStyle]="{ 'min-width': '60rem' }"
+            [columns]="cols"
+            [exportHeader]="'customExportHeader'"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [globalFilterFields]="['sp_cd', 'sp_nm', 'web_site', 'phone_nb', 'e_mail']"
+            editMode="row"
+            [scrollable]="true"
+            [(selection)]="selectedTableQR"
+            [totalRecords]="totalRecords"
+        >
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto *:*:text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button class="col-start-1 col-span-2 xl:col-start-1 xl:col-span-1"
+                                  [label]="this.valLanguage.btn_ClearFilter[optionLanguage]" [outlined]="true"
+                                  icon="pi pi-filter-slash" (click)="clear(dt1)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[optionLanguage]"
+                                  (click)="exportToExcel()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                                  [label]="this.valLanguage.btn_ShowFilter[optionLanguage]"
+                                  (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-plus" [label]="this.valLanguage.btn_Create[this.optionLanguage]"
+                                  (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input
+                            pInputText
+                            class="w-full"
+                            type="text"
+                            (input)="global_sv.onGlobalFilter($event, dt1)"
+                            [title]="this.valLanguage.searchBySupplierInformation[optionLanguage]"
+                            [placeholder]="this.valLanguage.searchBySupplierInformation[optionLanguage]"
+                        />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header let-columns>
+                <tr>
+                    <th pFrozenColumn>
+                        <p-button icon="pi pi-trash" [rounded]="true" severity="danger" />
+                    </th>
+                    <th pFrozenColumn>
+                        <div class="flex justify-center">
+                            <p-button icon="pi pi-file-edit" [rounded]="true" severity="info" />
+                        </div>
+                    </th>
+                    <!--                    <th pFrozenColumn>-->
+                    <!--                        <div class="flex justify-center">-->
+                    <!--                            <p-button icon="pi pi-file-edit" [rounded]="true" severity="info" />-->
+                    <!--                        </div>-->
+                    <!--                    </th>-->
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{ header.header }}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th></th>
+                    @for (col of columns; track $index) {
+                        @if (col.type == 'Text') {
+                            <th>
+                                <p-columnFilter type="text" matchMode="contains" [field]="col.field"
+                                                [placeholder]="'Search by '+col.header"
+                                                [ariaLabel]="'Filter '+col.header"></p-columnFilter>
+                            </th>
+                        } @else if (col.type == 'Date') {
+                            <th>
+                                <div class="flex justify-center item-center">
+                                    <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                                    <p-columnFilter type="date" [field]="col.field" display="menu"
+                                                    [showMatchModes]="true" [showOperator]="false"
+                                                    [showAddButton]="true">
+                                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                            <p-datepicker
+                                                #calendar
+                                                [ngModel]="value"
+                                                (onSelect)="filter(calendar.value)"
+                                                (onInput)="setup(calendar.value, col.field)"
+                                                [showButtonBar]="true"
+                                                [placeholder]="loading ? 'Loading...Please wait!' : 'Choose Date'"
+                                                [disabled]="loading"
+                                                dateFormat="yy-mm-dd"
+                                            >
+                                            </p-datepicker>
+                                        </ng-template>
+                                    </p-columnFilter>
+                                </div>
+                            </th>
+                        }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-editing="editing" let-ri="rowIndex">
+                <tr
+                    [pEditableRow]="information"
+                    [ngClass]="{
+                        'even-row': ri % 2 === 0,
+                        'odd-row': ri % 2 === 1,
+                        'selected-row': selectedRow === ri,
+                        'clickable-row': true
+                    }"
+                    (click)="onRowClick(ri)"
+                >
+
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <p-button icon="pi pi-trash" rounded text
+                                      severity="danger" (click)="confirmDelete($event, information)" />
+                        </div>
+                    </td>
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <p-button [rounded]="true" severity="info" [outlined]="true" pButton
+                                      pRipple pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(information)"
+                                      text rounded></p-button>
+                        </div>
+                    </td>
+                    <td *ngFor="let col of columns">
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd') {
+                            {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        } @else {
+                            {{ information[col.field] }}
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="13">No Information found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-dialog
+        [header]="isEdit ? valLanguage.nameUpdateSupplierInformation[optionLanguage] : valLanguage.nameCreateSupplierInformation[optionLanguage]"
+        [(visible)]="isOpenDialog" modal resizable draggable>
+        <form
+            class="needs-validation rounded grid md:grid-cols-2 gap-2 md:gap-x-4 *:mt-5"
+            novalidate
+            [formGroup]="addSuppForm"
+            *ngIf="addSuppForm"
+            (ngSubmit)="isEdit ? updateSupp() : createSupp()"
+        >
+            <p-floatlabel>
+                <input
+                    class="w-full"
+                    pInputText
+                    id="over_label"
+                    [pTooltip]="invalidCode ? 'Code existed' : ''"
+                    tooltipPosition="top"
+                    maxlength="10"
+                    (change)="onChangeCode()"
+                    [style.border]="invalidCode ? '1px solid red' : ''"
+                    formControlName="inputCode"
+                    [readonly]="isEdit"
+                    autocomplete="off"
+                />
+                <label for="over_label">{{ this.valLanguage.grid_Code[optionLanguage] }}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <input class="w-full" pInputText id="name" formControlName="inputName" autocomplete="off" />
+                <label for="over_label">{{ this.valLanguage.grid_Name[optionLanguage] }}</label>
+            </p-floatlabel>
+            <p-floatlabel class="col-span-2">
+                <input class="w-full" pInputText id="descrption" formControlName="inputDescription"
+                       autocomplete="off" />
+                <label for="over_label">{{ this.valLanguage.grid_Description[optionLanguage] }}</label>
+            </p-floatlabel>
+        </form>
+
+        <div class="mt-10 w-full">
+
+            <p-button
+                label="{{isEdit ? this.valLanguage.nameUpdateSupplierInformation[this.optionLanguage] : this.valLanguage.nameCreateSupplierInformation[this.optionLanguage]}}"
+                variant="outlined" severity="warn" class="w-full *:w-full"
+                (click)="isEdit ? updateSupp() : createSupp()"
+            />
+        </div>
+    </p-dialog>
+
+</section>

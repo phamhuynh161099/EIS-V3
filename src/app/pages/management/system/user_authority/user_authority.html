@@ -1,0 +1,344 @@
+<section class="flex flex-col min-h-full w-full">
+    <div class="header-title">
+        <h2 class="text-2xl mb-0 sm:text-3xl">{{this.valLanguage['UserAuthority(M)'][this.optionLanguage]}}</h2>
+    </div>
+
+    <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+        <p-table #dt1 [scrollable]="true" scrollHeight="400px" virtualScrollItemSize="46"
+            [loading]="loadingTable" [columns]="cols" [value]="data" [showCurrentPageReport]="true"
+            [globalFilterFields]="['userid', 'uname', 'e_mail', 'cell_nb']" [tableStyle]="{ 'min-width': '50rem' }"
+            (sortFunction)="customSort($event)" [customSort]="true" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            [rowsPerPageOptions]="[50, 100, 200, 500, 1000]" [paginator]="true" [rows]="50"
+            [showCurrentPageReport]="true" [totalRecords]="totalRecords">
+            <ng-template #caption>
+                <div class="pb-4 text-lg font-bold">
+                    {{this.valLanguage.Member_Info[this.optionLanguage]}}
+                </div>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto *:*:text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button severity="secondary" [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]"
+                            [outlined]="true" icon="pi pi-filter-slash" (click)="onClearTable(dt1)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[this.optionLanguage]"
+                            (click)="exportToExcelTb1()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter()"></p-button>
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="global_sv.onGlobalFilter($event, dt1)"
+                            title="{{this.valLanguage.searchByUserAuthority[this.optionLanguage]}}"
+                            placeholder="{{this.valLanguage.searchByUserAuthority[this.optionLanguage]}}" />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header pTemplate="header">
+                <tr>
+                    <th></th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{header.header}}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <!-- <th pFrozenColumn></th> -->
+                    <th></th>
+                    @for (col of cols; track col.field) {
+                    @if (col.type == 'Text') {
+                    <th><p-columnFilter matchMode="contains" class="*:min-w-52" type="text" [field]="col.field"
+                            [placeholder]="loadingTable ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Option') {
+                    <th>
+                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'use_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="useYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(useYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loadingTable ? 'Loading...Please wait!' : 'yyyy-MM-DD'"
+                                        [disabled]="loadingTable" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    } @else if (col.type == 'MultiSelect') {
+                    <th class="min-w-60">
+                        <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'grade_nm') {
+                                <p-multiselect [options]="grades" variant="outlined" [showToggleAll]="false"
+                                    [selectAll]="selectAllGradeTable" [(ngModel)]="gradeTableFilterValue"
+                                    (onChange)="filter(gradeTableFilterValue)" optionLabel="label"
+                                    [loading]="loadingTable" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30" [filter]="false"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-32"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'grade_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_grade_nm>
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" [severity]="global_sv.getGradeColor(option.label)" *ngIf="option.label" />
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                <tr [ngClass]="{
+                            'even-row': ri % 2 === 0,
+                            'odd-row': ri % 2 === 1,
+                            'selected-row': selectedRowTb1 === ri,
+                            'clickable-row': true
+                        }" (click)="onRowClickTb1(information.userid, ri)">
+                    <td aria-describedby="list_rn">{{ ri + 1 }}</td>
+                    <td *ngFor="let col of columns" class="text-nowrap">
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd'){
+                        {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        } @else if (col.field == 'grade_nm'){
+                        <p-tag [value]="information[col.field]" class="w-full"
+                            [severity]="global_sv.getGradeColor(information[col.field])" />
+                        }
+                        @else{
+                        {{ information[col.field] }}
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+
+    <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+        <p-table #dt2 class="min-h-80 max-h-80" [scrollable]="true" scrollHeight="400px" virtualScrollItemSize="400"
+            [loading]="loadingDataTable2" [columns]="colsTable2" [value]="dataTable2" [showCurrentPageReport]="true"
+            [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort2($event)" [customSort]="true"
+            (onPage)="pageChange($event)" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            [rowsPerPageOptions]="[50, 100, 200, 500, 1000]" [paginator]="true" [rows]="50"
+            [showCurrentPageReport]="true" [totalRecords]="recordsTable2">
+            <ng-template #caption>
+                <div class="flex justify-between flex-col sm:flex-row sm:items-center sm:flex-wrap space-y-2 pb-4 md:pb-2">
+                    <span class="font-semibold text-base md:text-lg">{{this.valLanguage.Member_Location_Authority_Connection[this.optionLanguage]}}</span>
+                    <p-button [outlined]="true" icon="pi pi-save" class="w-40 *:w-full ml-auto" label="Save"
+                        [disabled]="selectedUserId == ''"
+                        [pTooltip]="selectedUserId == '' ? 'Please select Member Info Grid' : ''" tooltipPosition="left"
+                        (click)="onSave()" severity="info" />
+                </div>
+                <div class="flex gap-4 text-nowrap overflow-x-auto pb-2 sm:pb-0">
+                    <p-button [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]"
+                        severity="secondary" [outlined]="true" icon="pi pi-filter-slash" (click)="onClearTable(dt2)" />
+                    <p-button [outlined]="true" [icon]="isVisible2 ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                        [disabled]="recordsTable2 == 0" class="text-nowrap"
+                        [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter2()"></p-button>
+                    <p-button [outlined]="true" icon="pi pi-file-excel"
+                        [label]="this.valLanguage.btn_Export[this.optionLanguage]" [disabled]="recordsTable2 == 0"
+                        (click)="exportToExcelTb2()" />
+                </div>
+            </ng-template>
+            <ng-template #header pTemplate="header">
+                <tr>
+                    @for (header of colsTable2; track header) {
+                    @if (header.field == 'check_yn') {
+                    <th class="cursor-pointer">
+                        <div class="header-content">
+                            <input type="checkbox" class="dark:accent-ams-blue accent-gray-dark" [(ngModel)]="selectAll"
+                                (change)="onChangeSelectAll()">
+                        </div>
+                    </th>
+                    }@else if (header.field == 'rnum') {
+                    <th></th>
+                    }@else{
+                    <th [pSortableColumn]="header.field" class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{header.header}}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                    }
+                    }
+
+                </tr>
+                <tr [hidden]="isVisible2">
+                    <!-- <th pFrozenColumn></th> -->
+                    @for (col of colsTable2; track col.field) {
+                    @if (col.type == 'Text') {
+                    <th><p-columnFilter matchMode="contains" type="text" class="*:min-w-52" [field]="col.field"
+                            [placeholder]="loadingDataTable2 ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Number') {
+                    <th><p-columnFilter type="numeric" class="*:min-w-52" [field]="col.field"
+                            [placeholder]="loadingDataTable2 ? 'Loading...Please wait!' : 'Number'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Option') {
+                    <th>
+                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'use_yn') {
+                                <p-select [loading]="loadingDataTable2" [(ngModel)]="useYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(useYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'sp_yn') {
+                                <p-select [loading]="loadingDataTable2" [(ngModel)]="spYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(spYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'mv_yn') {
+                                <p-select [loading]="loadingDataTable2" [(ngModel)]="mvYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(mvYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'ds_yn') {
+                                <p-select [loading]="loadingDataTable2" [(ngModel)]="dsYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(dsYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'rt_yn') {
+                                <p-select [loading]="loadingDataTable2" [(ngModel)]="rtYNTable2FilterValue"
+                                    [options]="ysList" (onChange)="filter(rtYNTable2FilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'check_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="checkYNTableFilterValue"
+                                    [options]="check_ysList" (onChange)="filter(checkYNTableFilterValue)"
+                                    optionValue="value" filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loadingTable ? 'Loading...Please wait!' : 'yyyy-MM-DD'"
+                                        [disabled]="loadingTable" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    } @else if (col.type == 'MultiSelect') {
+                    <th class="min-w-56">
+                        <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'lct_nm') {
+                                <p-multiselect [options]="locations" variant="outlined" [showToggleAll]="true"
+                                    [selectAll]="selectAllLctNmTable" [(ngModel)]="locationTableFilterValue"
+                                    (onChange)="filter(locationTableFilterValue)" optionLabel="label"
+                                    [loading]="loadingTable" optionValue="label" [virtualScroll]="true"
+                                    [virtualScrollItemSize]="30"
+                                    class="multiselect-custom-virtual-scroll max-w-full min-w-64"
+                                    placeholder="Select Multiple"
+                                    (onSelectAllChange)="onSelectAllChangeTable($event, 'lct_nm')"
+                                    [maxSelectedLabels]="2" styleClass="w-full" #ms_lct_nm>
+                                    <ng-template #headercheckboxicon let-allSelected
+                                        let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected"
+                                            [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    } @else {
+                    <th></th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                <tr [ngClass]="{
+                        'even-row': ri % 2 === 0,
+                        'odd-row': ri % 2 === 1,
+                        'selected-row': selectedRowTb2.includes(information),
+                        'clickable-row': true
+                    }" (click)="onRowClickTb2(information)">
+                    <td *ngFor="let col of columns" class="text-nowrap">
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd'){
+                        {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        } @else if (col.field == 'use_yn' || col.field == 'sp_yn' || col.field == 'mv_yn' || col.field
+                        == 'ds_yn' || col.field == 'rt_yn'){
+                        <p-tag [value]="information[col.field]" *ngIf="information[col.field]" class="w-full"
+                            [severity]="global_sv.getUseYNColor(information[col.field])" />
+                        } @else if (col.field == 'lct_nm'){
+                        <p-tag [value]="information[col.field]" *ngIf="information[col.field]" class="w-full"
+                            severity="secondary" />
+                        } @else if (col.field == 'check_yn'){
+                        <input type="checkbox" class="dark:accent-ams-blue accent-gray-dark"
+                            [checked]="selectedRowTb2.includes(information)">
+                        }@else{
+                        {{ information[col.field] }}
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+</section>

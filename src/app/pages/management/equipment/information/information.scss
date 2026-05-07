@@ -1,0 +1,112 @@
+::ng-deep {
+    .p-datepicker-input {
+        width: 14rem !important;
+    }
+    .p-progressspinner-circle {
+        stroke: var(--grid-stroke) !important;
+    }
+    .status-badge{
+        width: 52px;
+        flex-shrink: 0;
+    }
+    .factory-badge{
+        min-width: 140px;
+        flex-shrink: 0;
+    }
+    #search-by-excel-dialog{
+        p-select{
+            .p-overlay.p-component{
+                top: unset !important;
+                bottom: 34px !important;
+            }
+        }
+
+        .p-dialog-content{
+            @media (width > 640px) {
+                min-width: 400px;
+            }
+        }
+    }
+    p-dialog {
+
+        &#update-dialog .p-dialog{
+            width: 800px;
+            min-height: 870px;
+
+            @media (width < 640px) {
+                width: 100vw;
+                height: 100vh;
+                border-radius: unset;
+
+                .p-dialog-header {
+                    padding-top: 30px;
+                    padding-bottom: 5px;
+                }
+            }
+
+
+            .p-dialog-content{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 80vh !important;
+
+                @media (width < 640px) {
+                    height: 90vh !important;
+                }
+            }
+
+            p-orderlist {
+                overflow: hidden;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                padding-bottom: 40px;
+
+                .p-orderlist-list-container {
+                    flex-grow: 1;
+                }
+                .p-orderlist.p-component, .p-listbox-list-container{
+                    height: 100% !important;
+                    max-height: 100% !important;
+                }
+
+                .p-orderlist-controls {
+                    display: none;
+                }
+                .p-listbox.p-component, .p-orderlist{
+                    height: 100% !important;
+                }
+                .p-listbox.p-component {
+                    display: flex;
+                    flex-direction: column;
+
+                    @media (width < 640px) {
+                        .p-listbox-list-container {
+                            max-height: unset !important;
+                            height: 60vh !important;
+                        }
+                    }
+                }
+            }
+
+            .p-dialog-content{
+                @media (width < 640px) {
+                    padding: unset;
+
+                    .footer{
+                        padding: 0 4px 4px 4px;
+                        margin-bottom: 25px;
+                        height: fit-content;
+                    }
+                }
+            }
+        }
+
+        p-datepicker .p-datepicker-panel {
+            top: unset !important;
+            bottom: 100%;
+        }
+    }
+
+}

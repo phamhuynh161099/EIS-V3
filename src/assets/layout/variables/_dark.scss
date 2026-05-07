@@ -1,0 +1,19 @@
+:root[class*='app-dark'] {
+    --surface-ground: #222;
+    --code-background: var(--p-surface-800);
+    --code-color: var(--p-surface-100);
+
+    // custom theme variable
+    --login-bg: #f2f2f2;
+    --login-bglinear: rgb(36, 43, 56);
+    --login-bggradient: #000;
+    --login-stroke: #333;
+    --grid-stroke: #fff;
+    --input-bg: #000;
+    --input-text: #fff;
+    --border-color-create: rgba(255, 193, 6, 0.3);
+    --chart-null-bg: #000;
+    --tmp-dialog-bg: #000;
+    --bg-header-tb: #000;
+    --hover-tb: #555;
+}

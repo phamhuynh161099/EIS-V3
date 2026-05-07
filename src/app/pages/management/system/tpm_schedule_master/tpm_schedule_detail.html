@@ -1,0 +1,216 @@
+<section>
+    <p-toast />
+    <p-confirmdialog />
+    <div class="card">
+        <span class="text-2xl font-semibold">{{this.valLanguage.Schedule_Detail[this.optionLanguage]}}</span>
+        <p-table #dtTB class="table_minheight" [value]="dataTable" (sortFunction)="customSort($event)"
+            [customSort]="true" exportFilename="QR Code Management" dataKey="tdno" showGridlines
+            [tableStyle]="{ 'min-width': '60rem' }" [columns]="cols" [exportHeader]="'customExportHeader'"
+            [rowsPerPageOptions]="[10, 25, 50]" [loading]="loading" [paginator]="true" [rows]="rows" [first]="first"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" editMode="row"
+            [globalFilterFields]="['tc_cd', 'tc_nm', 'td_nm']" editMode="row" [scrollable]="true"
+            [(selection)]="selectedTableQR" [totalRecords]="totalRecords">
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-x-3 gap-y-2">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" [outlined]="true"
+                            [raised]="true" severity="secondary" icon="pi pi-filter-slash" (click)="clear(dtTB)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[this.optionLanguage]"
+                            (click)="exportToExcel()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="ShowFilter()"></p-button>
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="onGlobalFilter($event, dtTB)"
+                            title="{{this.valLanguage.searchByScheduleDetail[this.optionLanguage]}}"
+                            placeholder="{{this.valLanguage.searchByScheduleDetail[this.optionLanguage]}}" />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header let-columns>
+                <tr>
+                    <th pFrozenColumn><p-button icon="pi pi-file-edit" [rounded]="true" severity="info" /></th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{ header.header }}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th pFrozenColumn></th>
+                    @for (col of columns; track $index) {
+                    @if (col.field === 'td_nm') {
+                    <th>
+                        <p-columnFilter field="tpmItem_name" matchMode="in" [showMatchModes]="false"
+                            [showOperator]="false" [showAddButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-multiselect [ngModel]="value" [options]="tpmItemTable" placeholder="Select Multiple" [filter]="false"
+                                    (onChange)="filter($event.value, 'tpmItem_name')" optionLabel="label"
+                                    [panelStyle]="{ minWidth: '16rem' }">
+                                    <ng-template #headercheckboxicon let-allSelected let-partialSelected="partialSelected">
+                                        <i class="pi pi-check" *ngIf="allSelected"></i>
+                                        <i class="pi pi-minus" *ngIf="partialSelected" [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                    </ng-template>
+                                </p-multiselect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <!-- } @else if (col.field === 'use_yn') {
+                    <th>
+                        <p-columnFilter field="use_name" matchMode="in" [showMatchModes]="false" [showOperator]="false"
+                            [showAddButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-multiselect [ngModel]="value" [options]="useTable" placeholder="Select Type"
+                                    (onChange)="filter($event.value, 'use_name')" optionLabel="label"
+                                    [panelStyle]="{ minWidth: '16rem' }">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" severity="secondary" />
+                                    </ng-template>
+                                </p-multiselect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th> -->
+                    } @else if (col.type == 'Text') {
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" [field]="col.field"
+                            [placeholder]="'Search by ' + col.header"
+                            [ariaLabel]="'Filter ' + col.header"></p-columnFilter>
+                    </th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loading ? 'Loading...Please wait!' : 'Choose Date'"
+                                        [disabled]="loading" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-editing="editing" let-ri="rowIndex">
+                <tr [pEditableRow]="information" (click)="onRowClick(ri)"
+                    [ngClass]="{'selected-row': selectedRow === ri, 'clickable-row' : true}">
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
+                                (click)="onRowEditInit(information)" text rounded severity="info"></button>
+                            <p-button *ngIf="editing" icon="pi pi-check" [rounded]="true" [text]="true" [raised]="true"
+                                severity="success" pSaveEditableRow (click)="onRowEditSave(information)" />
+                            <p-button *ngIf="editing" icon="pi pi-times" pCancelEditableRow [rounded]="true"
+                                [text]="true" [raised]="true" severity="secondary"
+                                (click)="onRowEditCancel(information, ri)" />
+                        </div>
+                    </td>
+                    <td *ngFor="let col of columns">
+                        @if (col.field === 'td_nm') {
+                        <p-cellEditor>
+                            <ng-template #input>
+                                <p-select [filter]="true" filterBy="label" optionValue="label" [options]="tpmItem"
+                                    appendTo="body" [(ngModel)]="information[col.field]" [style]="{ width: '100%' }">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                                    </ng-template>
+                                </p-select>
+                            </ng-template>
+                            <ng-template #output>
+                                <p-tag [value]="information[col.field]" severity="secondary" />
+                            </ng-template>
+                        </p-cellEditor>
+                        } @else if (col.field === 'use_yn') {
+                        <p-cellEditor>
+                            <ng-template #input>
+                                <p-select [filter]="true" filterBy="value" optionValue="value" [options]="use"
+                                    appendTo="body" [(ngModel)]="information[col.field]" [style]="{ width: '100%' }">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                                    </ng-template>
+                                </p-select>
+                            </ng-template>
+                            <ng-template #output>
+                                <p-tag [value]="information[col.field]" severity="secondary" />
+                            </ng-template>
+                        </p-cellEditor>
+                        } @else if (col.field === 're_mark' || col.field === 'order_no') {
+                        <p-cellEditor>
+                            <ng-template #input>
+                                <input pInputText type="text" [(ngModel)]="information[col.field]" />
+                            </ng-template>
+                            <ng-template #output>
+                                {{ information[col.field] }}
+                            </ng-template>
+                        </p-cellEditor>
+                        } @else {
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd') {
+                        {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        } @else {
+                        {{ information[col.field] }}
+                        }
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="16">{{this.valLanguage.No_data_found[this.optionLanguage]}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div class="card">
+        <div class="flex gap-4 flex-wrap justify-between items-center mb-3">
+            <span class="text-2xl font-semibold">{{this.valLanguage.Create_Schedule_Detail[this.optionLanguage]}}</span>
+            <p-button label="{{this.valLanguage.btn_Create_Detail[this.optionLanguage]}}" [disabled]="invalidCode"
+                class="w-40 *:w-full ml-auto" variant="outlined" severity="warn" (click)="createFunction(addFunctionForm)" />
+        </div>
+        <form novalidate
+            class="needs-validation rounded grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 *:w-full *:max-w-sm *:mx-auto p-5 gap-7 bottom-border-card pt-8"
+            [formGroup]="addFunctionForm" *ngIf="addFunctionForm" (ngSubmit)="createFunction(addFunctionForm)">
+            <p-floatlabel>
+                <input class="w-full" readonly pInputText id="ScheduleCode" formControlName="inputScheduleCode"
+                    autocomplete="off" />
+                <label for="ScheduleCode">{{this.valLanguage.grid_Schedule_Code[this.optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <p-select [filter]="false" filterBy="label" class="w-full" formControlName="inputTPMItem"
+                    [options]="tpmItem" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" class="w-full !py-2" />
+                    </ng-template>
+                </p-select>
+                <label for="parent_filter">{{this.valLanguage.grid_TPM_Item[this.optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <p-select [filter]="false" filterBy="label" class="w-full" formControlName="inputUse" [options]="use"
+                    [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" [severity]="global_sv.getUseYNColor(option.value)" class="w-full !py-2" />
+                    </ng-template>
+                </p-select>
+                <label for="parent_filter">{{this.valLanguage.grid_UseYN[this.optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <p-inputnumber class="w-full" id="dt_order" formControlName="inputOrder" autocomplete="off" />
+                <label for="dt_order">{{this.valLanguage.grid_Order_No[this.optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <input class="w-full" pInputText id="dt_exp" formControlName="inputExplain" autocomplete="off" />
+                <label for="dt_exp">{{this.valLanguage.grid_Detail_Explain[this.optionLanguage]}}</label>
+            </p-floatlabel>
+        </form>
+    </div>
+</section>

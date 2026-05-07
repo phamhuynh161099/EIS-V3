@@ -1,0 +1,37 @@
+name: ${{ gitea.actor }} compile on ${{ gitea.ref_type }} ${{ gitea.ref_name }}
+on:
+  workflow_call:
+    inputs:
+      profile:
+        required: true
+
+jobs:
+  compile:
+    name: Compile & package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+
+      - name: Run build
+        id: run-build
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --legacy-peer-deps
+          npm run build:${{ inputs.profile }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ gitea.event.repository.name }}
+          path: ./dist/browser/*
+          compression-level: 9
+          overwrite: true

@@ -1,0 +1,272 @@
+<p-toast />
+<p-confirmdialog />
+<section class="bg-red-300 overflow-y-scroll custom-main-wrapper bg-white p-2 space-y-2"
+    [style.minHeight.px]="boxHeight()">
+    <!-- <p-confirmdialog /> -->
+
+    <section id="block-filter" class="w-full">
+        <div class="relative rounded-2xl border border-gray-light bg-white p-4 shadow-md">
+
+            <div class="flex flex-wrap items-center gap-3 pr-12">
+
+                <div>
+                    <p class="uppercase text-3xl font-bold text-slate-600">Engineer Mapper Line Management</p>
+                </div>
+
+            </div>
+
+            <div class="mt-2 flex justify-end border-t border-gray-light pt-3">
+                <div class="flex flex-wrap items-center gap-3 pr-12">
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section id="block-table" class="mx-auto !rounded-2xl shadow-lg p-2 border border-gray-light"
+        [style.height.px]="boxHeightTable()" style="position: relative;">
+        <p-table styleClass="tbl-line-of-esp p-datatable-lg" #dt [value]="engineerConnectLine" [paginator]="true"
+            [rows]="5" [rowsPerPageOptions]="[5, 10, 20]"
+            [globalFilterFields]="['eng_name', 'engineer_esp_mac', 'engineer_esp_ip', 'line_name','line_esp_mac','line_esp_ip','status']"
+            responsiveLayout="scroll" [scrollable]="true" scrollHeight="flex" paginatorDropdownAppendTo="body">
+
+
+
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-2">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [outlined]="true" [icon]="isShowFilter ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            label="Show Filter" (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-plus" label="Add New" (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+
+                    <p-iconfield iconPosition="left" class="w-full sm:w-auto">
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Search..." class="w-full rounded-lg border-slate-300 sm:w-72" />
+                    </p-iconfield>
+
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id" class="!bg-slate-50 !text-slate-600">
+                        Id <p-sortIcon field="id" />
+                    </th>
+                    <th pSortableColumn="eng_name" class="!bg-slate-50 !text-slate-600">
+                        Enginer Name/Code <p-sortIcon field="eng_name" />
+                    </th>
+
+                    <th pSortableColumn="engineer_esp_mac" class="!bg-slate-50 !text-slate-600">
+                        ESP ENGINER MAC <p-sortIcon field="engineer_esp_mac" />
+                    </th>
+
+                    <th pSortableColumn="engineer_esp_ip" class="!bg-slate-50 !text-slate-600">
+                        ESP ENGINER IP <p-sortIcon field="engineer_esp_ip" />
+                    </th>
+
+
+                    <th pSortableColumn="line_name" class="!bg-slate-50 !text-slate-600">
+                        Line Name/Code <p-sortIcon field="line_name" />
+                    </th>
+
+                    <th pSortableColumn="line_esp_mac" class="!bg-slate-50 !text-slate-600">
+                        ESP LINE MAC <p-sortIcon field="line_esp_mac" />
+                    </th>
+
+                    <th pSortableColumn="line_esp_ip" class="!bg-slate-50 !text-slate-600">
+                        ESP LINE IP <p-sortIcon field="line_esp_ip" />
+                    </th>
+
+                    <th pSortableColumn="status" class="!bg-slate-50 !text-slate-600">
+                        STATUS <p-sortIcon field="status" />
+                    </th>
+
+                    <th class="!bg-slate-50 !text-slate-600 text-center">ACTION</th>
+
+                </tr>
+                <tr [hidden]="isShowFilter">
+                    <th>
+
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="eng_name"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="engineer_esp_mac"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="engineer_esp_ip"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="line_name"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="line_esp_mac"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="line_esp_ip"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="status"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-engineerConnectLine let-ri="rowIndex">
+                <tr class="transition-colors hover:bg-slate-50/50">
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ engineerConnectLine.id }}</span>
+                    </td>
+
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-slate-800">{{ engineerConnectLine.eng_name }}</span>
+                                <span class="text-sm text-slate-500"></span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ engineerConnectLine.engineer_esp_mac }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ engineerConnectLine.engineer_esp_mac }}</span>
+                    </td>
+
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-slate-800">{{ engineerConnectLine.line_name }}</span>
+                                <span class="text-sm text-slate-500">{{ engineerConnectLine.line_code }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ engineerConnectLine.line_esp_mac }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ engineerConnectLine.line_esp_ip }}</span>
+                    </td>
+
+                    <td>
+                        <p-tag [value]="engineerConnectLine.status" [severity]="getSeverity(engineerConnectLine.status)"
+                            [rounded]="true" />
+                    </td>
+
+                    <td class="text-center">
+                        <div class="flex items-center justify-start gap-2">
+                            <!-- <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+                                pTooltip="Edit" (click)="onRowEditInit(engineerConnectLine, ri)" />
+                            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                                pTooltip="Remove" (click)="confirmRemove($event, engineerConnectLine)" /> -->
+                            @if (engineerConnectLine.status === 'Active') {
+                            <p-button icon="pi pi-delete-left" [rounded]="true" [text]="true" severity="danger"
+                                label="Disconnect" pTooltip="Disconnect"
+                                (click)="confirmRemove($event, engineerConnectLine)" />
+                            } @else {
+                            <p-button icon="pi pi-paperclip" [rounded]="true" [text]="true" severity="primary"
+                                label="Reconnect" pTooltip="Reconnect"
+                                (click)="confirmReconnect($event,engineerConnectLine)" />
+                            }
+
+
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center">
+                            <i class="pi pi-inbox mb-3 text-4xl text-slate-300"></i>
+                            <p>No Data Found.</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+
+    <p-dialog [(visible)]="isShowDialog"
+        [header]="isEdit ? 'Edit Engineer Mapper Line' : 'Add New Engineer Mapper Line'" modal>
+        <div class="space-y-4 flex flex-col md:h-auto h-full !max-h-[100%]">
+
+
+            <div class="w-full h-1 bg-gray"></div>
+
+            <form class="space-y-7 flex-1  w-full" novalidate [formGroup]="addModelForm" *ngIf="addModelForm"
+                (ngSubmit)="isEdit ? onEditSaved() : createModel()">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-2 *:md:min-w-[300px] *:flex-1 gap-4 mt-14 sm:mt-0">
+
+
+
+                    <p-floatlabel variant="on">
+                        <p-select inputId="espEngineer" class="w-full" [loading]="loading"
+                            formControlName="selectEspEngineer" [options]="listEngineer" filterBy="label"
+                            [filter]="true" [showClear]="false" appendTo="body">
+                            <ng-template let-option #item>
+
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="success"
+                                    icon="pi pi-check" />
+
+                            </ng-template>
+                        </p-select>
+                        <label for="espEngineer">Engineer</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <p-select inputId="espLine" class="w-full" [loading]="loading" formControlName="selectEspLine"
+                            [options]="listLine" filterBy="label" [filter]="true" [showClear]="false" appendTo="body">
+                            <ng-template let-option #item>
+
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="success"
+                                    icon="pi pi-check" />
+
+                            </ng-template>
+                        </p-select>
+                        <label for="espLine">Line</label>
+                    </p-floatlabel>
+                </div>
+            </form>
+
+            <!-- <div class="w-full h-1 bg-gray"></div> -->
+
+            <div class="flex justify-between mt-auto items-center space-x-2">
+                <!-- <p-button icon="pi pi-refresh" (click)="onResetUpdate()"
+                    [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="info" /> -->
+                <div class="scroll-p-2 space-x-2 max-w-md flex-1 flex *:flex-1 *:*:w-full">
+                    <p-button label="Cancle" severity="secondary" (click)="onEditCancel()" />
+                    <p-button label="Save" (click)="isEdit ? onEditSaved() : createModel()" />
+
+                    <!-- <p-button (onClick)="show()" label="Show" /> -->
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</section>

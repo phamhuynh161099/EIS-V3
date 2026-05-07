@@ -1,0 +1,424 @@
+<section>
+    <div class="header-title">
+        <div class="flex justify-between mb-3 xl:mb-0">
+            <h2>{{valLanguage.nameSAPEquipment[optionLanguage]}}</h2>
+            <div class="xl:flex">
+                <div class="btn_search_choose mr-3 mb-3 xl:mb-0">
+                    <p-button severity="info" variant="outlined" icon="pi pi-search"
+                        [label]="this.valLanguage.btn_Search[optionLanguage]" (click)="filterChooseSearch()" />
+                </div>
+                <div class="mr-3 mb-3 xl:mb-0">
+                    <p-button [label]="this.valLanguage.btn_Clear_All[optionLanguage]" [outlined]="true"
+                        severity="secondary" icon="pi pi-filter-slash" (click)="clearSearch(dtams, dtsap)" />
+                </div>
+                <p-button [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="secondary"
+                    icon="pi pi-refresh" (click)="ngOnInit()" />
+            </div>
+        </div>
+        <div class="rounded flex flex-wrap items-end gap-4 box p-5 header-border-filter">
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <input class="w-full" id="username" pInputText [(ngModel)]="materialFilterValue" />
+                <label for="username">{{valLanguage.grid_Material[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-40 mr-3 mb-5">
+                <p-select class="w-full" [(ngModel)]="corpFilterValue" (onChange)="handleChangeCorp($event)"
+                    [options]="corpFac" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" [severity]="global_sv.getCorpColor(option.label)" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Corp[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <p-select [filter]="true" filterBy="label" class="w-full" [(ngModel)]="parentFilterValue"
+                    [options]="parent" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="parent_filter">{{valLanguage.grid_Parent[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-40 mr-3 mb-5">
+                <p-select [filter]="true" filterBy="label" class="w-full" [(ngModel)]="statusFilterValue"
+                    [options]="status" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Status[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <input class="w-full" id="model_filter" pInputText [(ngModel)]="modelFilterValue" />
+                <label for="username">{{valLanguage.grid_Model[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-56 mr-3 mb-5">
+                <p-datepicker class="style_date" [showButtonBar]="true" dateFormat="yy/mm/dd"
+                    [(ngModel)]="createDateFilterValue" selectionMode="range" inputReadonly="true" />
+                <label for="create_date">{{valLanguage.grid_Create_Date[optionLanguage]}} (from-to)</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-56 mr-3 mb-5">
+                <p-datepicker class="style_date" [showButtonBar]="true" dateFormat="yy/mm/dd"
+                    [(ngModel)]="changeDateFilterValue" selectionMode="range" inputReadonly="true" />
+                <label for="create_date">{{valLanguage.grid_Change_Date[optionLanguage]}} (from-to)</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <p-select class="w-full" [(ngModel)]="salesFilterValue" [options]="sales" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Sales[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <p-select class="w-full" [(ngModel)]="partialSalesFilterValue" [options]="partialSales"
+                    [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Partial_Sales[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <p-select class="w-full" [(ngModel)]="transferFilterValue" [options]="transfer" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Transfer[optionLanguage]}}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-52 mr-3 mb-5">
+                <p-select class="w-full" [(ngModel)]="discardFilterValue" [options]="discard" [showClear]="true">
+                    <ng-template let-option #item>
+                        <p-tag [value]="option.label" severity="secondary" />
+                    </ng-template>
+                </p-select>
+                <label for="username">{{valLanguage.grid_Discard[optionLanguage]}}</label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <p-toast />
+    <div class="xl:flex justify-between mb-3">
+        <div class="card xl:w-[49%] !mb-0">
+            <div class="flex items-center justify-center">
+                <p-button label="SAP" class="w-full card-sap mr-3" variant="outlined" severity="info" />
+                <p-confirmdialog />
+                <p-button (click)="confirm1($event)" [label]="this.valLanguage.btn_MoveAMS[optionLanguage]"
+                    icon="pi pi-arrow-right" class="btn-move" iconPos="right" severity="warn" [outlined]="true" />
+                <p-progress-spinner *ngIf="loading_fullSAP" class="spinner-cl pl-3" strokeWidth="5" fill="transparent"
+                    animationDuration=".5s" [style]="{ width: '20px', height: '20px', color: '#333' }" />
+            </div>
+            <p-table #dtsap [value]="dataTableSap" exportFilename="QR Code Management" dataKey="rnum" showGridlines
+                [tableStyle]="{ 'max-width': '50%' }" [columns]="cols" [exportHeader]="'customExportHeader'"
+                [rowsPerPageOptions]="[rows, 25, 50]" [loading]="loadingSAP" [paginator]="true" [rows]="rows"
+                [first]="first" [showCurrentPageReport]="true" [autoLayout]="true"
+                (sortFunction)="customSortSap($event)" [customSort]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [globalFilterFields]="['corp_nm', 'prt_nm', 'factory_nm', 'mt_nm', 'mt_cd']" editMode="row"
+                [scrollable]="true" [(selection)]="selectedTableSAP" [totalRecords]="totalRecordsSAP">
+                <ng-template #caption>
+                    <div class="xl:flex justify-between">
+                        <div class="flex justify-start">
+                            <p-button class="mr-3" icon="pi pi-external-link"
+                                [label]="this.valLanguage.btn_Export[optionLanguage]" (click)="exportToExcel()"
+                                [outlined]="true" />
+                            <div class="mr-3">
+                                <p-button [label]="this.valLanguage.btn_ClearFilter[optionLanguage]"
+                                    severity="secondary" [outlined]="true" icon="pi pi-filter-slash"
+                                    (click)="clearSAP(dtsap)" />
+                            </div>
+                            <div class="mb-3 xl:mb-0">
+                                <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                                    [label]="this.valLanguage.btn_ShowFilter[optionLanguage]"
+                                    (click)="this.isVisibleSAP = !this.isVisibleSAP"></p-button>
+                            </div>
+                        </div>
+                        <p-iconfield iconPosition="left"
+                            class="btn_search_global row-start-1 col-start-1 col-end-5 xl:col-start-10 xl:col-end-13 ">
+                            <p-inputicon>
+                                <i class="pi pi-search"></i>
+                            </p-inputicon>
+                            <input pInputText type="text" (input)="onGlobalFilter($event, dtsap)"
+                                [title]="valLanguage.searchByEquipmentInformation[optionLanguage]"
+                                [placeholder]="valLanguage.searchByEquipmentInformation[optionLanguage]" />
+                        </p-iconfield>
+                    </div>
+                </ng-template>
+                <ng-template #header let-columns>
+                    <tr>
+                        <th pFrozenColumn>{{valLanguage.grid_No[optionLanguage]}}</th>
+                        <th pFrozenColumn>
+                            <!-- <p-tableHeaderCheckbox *ngIf="isVisibleCheckAll" /> -->
+                            <i class="pi pi-check"></i>
+                        </th>
+                        <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                            class="sortable-header cursor-pointer">
+                            <div class="header-content">
+                                <span>{{header.header}}</span>
+                                <p-sortIcon [field]="header.field" />
+                            </div>
+                        </th>
+                    </tr>
+                    <tr [hidden]="isVisibleSAP">
+                        <th pFrozenColumn></th>
+                        <th pFrozenColumn></th>
+                        @for (col of columns; track $index) {
+                        <!-- @if(col.field === 'prt_nm') {
+                        <th>
+                            <p-columnFilter field="prt_nm" matchMode="equals" [showMenu]="false">
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-select [(ngModel)]="parentTableFilterValue" [options]="parentTable"
+                                        (onChange)="filter(parentTableFilterValue)" placeholder="Select One"
+                                        [showClear]="true">
+                                        <ng-template let-option #item>
+                                            <p-tag [value]="option.value" severity="secondary" />
+                                        </ng-template>
+                                    </p-select>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        } -->
+                        @if(col.field === 'reg_dt_ymd' || col.field === 'chg_dt_ymd') {
+                        <th>
+                            <label class="w-32 opacity-55">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        placeholder="Registration Date" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else if(col.field === 'sts_nm') {
+                        <th>
+                            <p-columnFilter field="sts_nm" matchMode="equals" [showMenu]="false">
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-select [(ngModel)]="statusTableFilterValue" [options]="statusTable"
+                                        (onChange)="filter(statusTableFilterValue)" placeholder="Select One"
+                                        [showClear]="true">
+                                        <ng-template let-option #item>
+                                            <p-tag [value]="option.value" severity="secondary" />
+                                        </ng-template>
+                                    </p-select>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else {
+                        <th>
+                            <p-columnFilter type="text" [field]="col.field" [placeholder]="'Search by'+col.header"
+                                [ariaLabel]="'Filter'+col.header"></p-columnFilter>
+                        </th>
+                        }
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                    <tr>
+                        <td pFrozenColumn>{{ri+1}}</td>
+                        <td pFrozenColumn>
+                            <p-tableCheckbox [value]="information" />
+                        </td>
+                        @for (col of columns; track $index) {
+                        <td>
+                            @if(col.field === 'reg_dt_ymd' || col.field === 'chg_dt_ymd') {
+                            {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                            } @else if(col.field === 'puchs_dt_ymd' ){
+                            {{ global_sv.checkDate(information[col.field]) }}
+                            } @else if(col.field === 'prt_nm' ){
+                            <p-tag [value]="information[col.field]" severity="secondary" />
+                            } @else {
+                            {{ information[col.field] }}
+                            }
+
+                        </td>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template #emptymessage>
+                    <tr>
+                        <td colspan="7">No customers found.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="card xl:w-[49%]">
+            <div class="flex items-center">
+                <p-button label="AMS" class="w-full card-ams" variant="outlined" severity="danger" />
+                <p-progress-spinner *ngIf="loading_full" class="spinner-cl pl-3" strokeWidth="5" fill="transparent"
+                    animationDuration=".5s" [style]="{ width: '20px', height: '20px', color: '#333' }" />
+            </div>
+            <p-table #dtams [value]="dataTable" exportFilename="QR Code Management" dataKey="rnum" showGridlines
+                [tableStyle]="{ 'max-width': '50%' }" [columns]="cols" [exportHeader]="'customExportHeader'"
+                [rowsPerPageOptions]="[rows, 25, 50]" [loading]="loading" [paginator]="true" [rows]="rows"
+                [first]="first" [showCurrentPageReport]="true" [autoLayout]="true"
+                (sortFunction)="customSortAms($event)" [customSort]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [globalFilterFields]="['corp_nm', 'prt_nm', 'factory_nm', 'mt_nm', 'mt_cd']" editMode="row"
+                [scrollable]="true" [totalRecords]="totalRecords">
+                <ng-template #caption>
+                    <div class="xl:flex justify-between">
+                        <div class="flex justify-start">
+                            <p-button class="mr-3" icon="pi pi-external-link"
+                                [label]="this.valLanguage.btn_Export[optionLanguage]" (click)="exportToExcel()"
+                                [outlined]="true" />
+                            <div class="mr-3">
+                                <p-button [label]="this.valLanguage.btn_ClearFilter[optionLanguage]"
+                                    severity="secondary" [outlined]="true" icon="pi pi-filter-slash"
+                                    (click)="clear(dtams)" />
+                            </div>
+                            <div class="mb-3 xl:mb-0">
+                                <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                                    [label]="this.valLanguage.btn_ShowFilter[optionLanguage]"
+                                    (click)="ShowFilter()"></p-button>
+                            </div>
+                        </div>
+                        <p-iconfield iconPosition="left"
+                            class="btn_search_global row-start-1 col-start-1 col-end-5 xl:col-start-10 xl:col-end-13 ">
+                            <p-inputicon>
+                                <i class="pi pi-search"></i>
+                            </p-inputicon>
+                            <input pInputText type="text" (input)="onGlobalFilter($event, dtams)"
+                                [title]="valLanguage.searchByEquipmentInformation[optionLanguage]"
+                                [placeholder]="valLanguage.searchByEquipmentInformation[optionLanguage]" />
+                        </p-iconfield>
+                    </div>
+                </ng-template>
+                <ng-template #header let-columns>
+                    <tr>
+                        <th pFrozenColumn>No</th>
+                        <th [pSortableColumn]="col.field" *ngFor="let col of columns">
+                            <div class="flex items-center gap-2">
+                                {{ col.header }}
+                                <p-sortIcon [field]="col.field" />
+                            </div>
+                        </th>
+                    </tr>
+                    <tr [hidden]="isVisible">
+                        <th></th>
+                        @for (col of columns; track $index) {
+                        @if(col.field === 'corp_nm') {
+                        <th>
+                            <p-columnFilter field="corn_name" matchMode="in" [showMatchModes]="false"
+                                [showOperator]="false" [showAddButton]="false">
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="corpTableFac" placeholder="Select Corp"
+                                        (onChange)="filter($event.value, 'corn_name')" optionLabel="label"
+                                        [panelStyle]="{ minWidth: '16rem' }">
+                                        <ng-template let-option #item>
+                                            <p-tag [value]="option.label" severity="secondary" />
+                                        </ng-template>
+
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else if(col.field === 'prt_nm') {
+                        <th>
+                            <p-columnFilter field="parent_name" matchMode="in" [showMatchModes]="false"
+                                [showOperator]="false" [showAddButton]="false">
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="parentTable" placeholder="Select Parent"
+                                        (onChange)="filter($event.value, 'parent_name')" optionLabel="label"
+                                        [panelStyle]="{ minWidth: '16rem' }">
+                                        <ng-template let-option #item>
+                                            <p-tag [value]="option.label" severity="secondary" />
+                                        </ng-template>
+
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else if(col.field === 'sts_nm') {
+                        <th>
+                            <p-columnFilter field="state_name" matchMode="in" [showMatchModes]="false"
+                                [showOperator]="false" [showAddButton]="false">
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    <p-multiselect [ngModel]="value" [options]="statusTable" placeholder="Select State"
+                                        (onChange)="filter($event.value, 'state_name')" optionLabel="label"
+                                        [panelStyle]="{ minWidth: '16rem' }">
+                                        <ng-template let-option #item>
+                                            <p-tag [value]="option.label" severity="secondary" />
+                                        </ng-template>
+
+                                    </p-multiselect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else if(col.field === 'reg_dt_ymd' || col.field === 'chg_dt_ymd') {
+                        <th>
+                            <label class="w-32 opacity-55">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        placeholder="Registration Date" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else if(col.field === 'chg_dt_ymd') {
+                        <th class="flex justify-center items-center">
+                            <label class="w-32 opacity-55">Search By Date:</label>
+                            <p-columnFilter type="date" field="chg_dt_ymd" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, 'chg_dt_ymd')" [showButtonBar]="true"
+                                        placeholder="Registration Date" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        }
+                        @else {
+                        <th>
+                            <p-columnFilter type="text" [field]="col.field" [placeholder]="'Search by'+col.header"
+                                [ariaLabel]="'Filter'+col.header"></p-columnFilter>
+                        </th>
+                        }
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                    <tr>
+                        <td pFrozenColumn>{{ri+1}}</td>
+                        @for (col of columns; track $index) {
+                        <td>
+                            @if(col.field === 'reg_dt_ymd' || col.field === 'chg_dt_ymd') {
+                            {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                            }@else if(col.field === 'puchs_dt_ymd' ){
+                            <!-- {{ global_sv.checkDate(information[col.field]) }} -->
+                            {{ information[col.field] }}
+                            }@else if(col.field === 'corp_nm' ){
+                            <p-tag [value]="information.corp_nm"
+                                [severity]="global_sv.getCorpColor(information.corp_nm)" />
+                            }@else if(col.field === 'prt_nm' ){
+                            <p-tag [value]="information[col.field]" severity="secondary" />
+                            }@else {
+                            {{ information[col.field] }}
+                            }
+
+                        </td>
+                        }
+                    </tr>
+                </ng-template>
+                <ng-template #emptymessage>
+                    <tr>
+                        <td colspan="7">No customers found.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </div>
+
+</section>

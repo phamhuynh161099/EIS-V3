@@ -1,0 +1,182 @@
+<p-toast />
+<p-confirmdialog />
+<section class="bg-red-300 overflow-y-scroll custom-main-wrapper bg-white p-2 space-y-2"
+    [style.minHeight.px]="boxHeight()">
+
+    <section id="block-filter" class="w-full">
+        <div class="relative rounded-2xl border border-gray-light bg-white p-4 shadow-md">
+
+            <div class="flex flex-wrap items-center gap-3 pr-12">
+
+                <div>
+                    <p class="uppercase text-3xl font-bold text-slate-600">Engineer Management</p>
+                </div>
+
+            </div>
+
+            <div class="mt-2 flex justify-end border-t border-gray-light pt-3">
+                <div class="flex flex-wrap items-center gap-3 pr-12">
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section id="block-table" class="mx-auto !rounded-2xl shadow-lg p-2 border border-gray-light"
+        [style.height.px]="boxHeightTable()" style="position: relative;">
+        <p-table styleClass="tbl-line-of-esp p-datatable-lg" #dt [value]="listEngineer" [paginator]="true" [rows]="50"
+            [rowsPerPageOptions]="[50, 100, 200]" [globalFilterFields]="['employee_id', 'eng_name']"
+            responsiveLayout="scroll" [scrollable]="true" scrollHeight="flex" paginatorDropdownAppendTo="body">
+
+            <!-- <ng-template pTemplate="caption">
+                <div class="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Danh sách nhân sự</h2>
+                        <p class="text-sm text-slate-500">Quản lý thành viên, vai trò và trạng thái hoạt động.</p>
+                    </div>
+
+                    <p-iconfield iconPosition="left" class="w-full sm:w-auto">
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Tìm kiếm thành viên..." class="w-full rounded-lg border-slate-300 sm:w-72" />
+                    </p-iconfield>
+                </div>
+            </ng-template> -->
+
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-2">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [outlined]="true" [icon]="isShowFilter ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            label="Show Filter" (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-plus" label="Add New" (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+
+                    <p-iconfield iconPosition="left" class="w-full sm:w-auto">
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Search..." class="w-full rounded-lg border-slate-300 sm:w-72" />
+                    </p-iconfield>
+
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id" class="!bg-slate-50 !text-slate-600">
+                        Id <p-sortIcon field="id" />
+                    </th>
+                    <th pSortableColumn="eng_name" class="!bg-slate-50 !text-slate-600">
+                        Engineer Name <p-sortIcon field="eng_name" />
+                    </th>
+
+                    <th pSortableColumn="employee_id" class="!bg-slate-50 !text-slate-600">
+                        Employee No <p-sortIcon field="employee_id" />
+                    </th>
+
+                    <th class="!bg-slate-50 !text-slate-600 text-center">ACTION</th>
+
+                </tr>
+                <tr [hidden]="isShowFilter">
+                    <th>
+
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="eng_name"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="employee_id"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-listEngineer let-ri="rowIndex">
+                <tr class="transition-colors hover:bg-slate-50/50">
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ listEngineer.id }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-semibold text-slate-800">{{ listEngineer.eng_name }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-bold text-slate-600">{{ listEngineer.employee_id }}</span>
+                    </td>
+
+
+                    <!-- <td>
+                        <p-tag [value]="listEngineer.status" [severity]="getSeverity(listEngineer.status)"
+                            [rounded]="true" />
+                    </td> -->
+
+                    <td class="text-center">
+                        <div class="flex items-center justify-start gap-2">
+                            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+                                pTooltip="Edit" (click)="onRowEditInit(listEngineer, ri)" />
+                            <!-- <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                                pTooltip="Remove" (click)="confirmRemove($event, listEngineer)" /> -->
+
+
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center">
+                            <i class="pi pi-inbox mb-3 text-4xl text-slate-300"></i>
+                            <p>No Data Found.</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+
+    <p-dialog [(visible)]="isShowDialog" [header]="isEdit ? 'Edit Engineer' : 'Add New Engineer'" modal>
+        <div class="space-y-4 flex flex-col md:h-auto h-full !max-h-[100%]">
+
+
+            <div class="w-full h-1 bg-gray"></div>
+
+            <form class="space-y-7 flex-1  w-full" novalidate [formGroup]="addModelForm" *ngIf="addModelForm"
+                (ngSubmit)="isEdit ? onEditSaved() : createModel()">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-2 *:md:min-w-[300px] *:flex-1 gap-4 mt-14 sm:mt-0">
+
+
+                    <p-floatlabel variant="on">
+                        <input inputId="engineerName" class="w-full" pInputText formControlName="selectEngineerName" />
+                        <label for="engineerName">Engineer Name</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <input inputId="employeeId" class="w-full" pInputText formControlName="selectEmployeeId" />
+                        <label for="employeeId">Employee Id</label>
+                    </p-floatlabel>
+
+                </div>
+            </form>
+
+            <!-- <div class="w-full h-1 bg-gray"></div> -->
+
+            <div class="flex justify-between mt-auto items-center space-x-2">
+                <div class="scroll-p-2 space-x-2 max-w-md flex-1 flex *:flex-1 *:*:w-full">
+                    <p-button label="Cancle" severity="secondary" (click)="onEditCancel()" />
+                    <p-button label="Save" (click)="isEdit ? onEditSaved() : createModel()" />
+
+                    <!-- <p-button (onClick)="show()" label="Show" /> -->
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</section>

@@ -1,0 +1,236 @@
+<section>
+    <p-toast />
+    <p-confirmdialog />
+    <div class="header-title">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3 xl:mb-0">
+            <h2 class="text-2xl sm:text-3xl mr-auto">
+                {{ valLanguage.nameManufacturerInformation[this.optionLanguage] }}
+                <p-progress-spinner *ngIf="loading_full" class="spinner-cl pl-3" strokeWidth="5" fill="transparent"
+                                    animationDuration=".5s"
+                                    [style]="{ width: '20px', height: '20px', color: '#333' }" />
+            </h2>
+            <div class="flex gap-2 *:w-[120px] *:*:w-full ml-auto">
+                <p-button [label]="valLanguage.btn_Refresh[optionLanguage]" severity="secondary" icon="pi pi-refresh"
+                          (click)="ngOnInit()" />
+                <p-button severity="info" variant="outlined" icon="pi pi-search"
+                          [label]="valLanguage.btn_Search[optionLanguage]" (click)="filterChooseSearch()" />
+            </div>
+        </div>
+        <div class="rounded flex flex-col sm:flex-row items-end gap-x-4 gap-y-7 box p-5 header-border-filter">
+            <p-floatlabel class="w-full sm:max-w-80">
+                <input class="w-full" id="username" pInputText [(ngModel)]="codeFilterValue" />
+                <label for="username">{{ this.valLanguage.grid_Code[this.optionLanguage] }}</label>
+            </p-floatlabel>
+
+            <p-floatlabel class="w-full sm:max-w-80">
+                <input class="w-full" id="model_filter" pInputText [(ngModel)]="nameFilterValue" />
+                <label for="username">{{ this.valLanguage.grid_Name[this.optionLanguage] }}</label>
+            </p-floatlabel>
+            <p-floatlabel class="w-full sm:max-w-80">
+                <input class="w-full" id="model_filter" pInputText [(ngModel)]="brandNameFilterValue" />
+                <label for="username">{{ this.valLanguage.grid_Brand_Name[this.optionLanguage] }}</label>
+            </p-floatlabel>
+        </div>
+    </div>
+    <div class="card">
+        <p-table
+            #dt
+            [value]="dataTable"
+            exportFilename="QR Code Management"
+            dataKey="rnum"
+            showGridlines
+            [tableStyle]="{ 'min-width': '60rem'}"
+            [columns]="cols"
+            [exportHeader]="'customExportHeader'"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [showCurrentPageReport]="true"
+            (sortFunction)="customSort($event)"
+            [customSort]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [globalFilterFields]="['mf_cd', 'mf_nm', 'brd_nm']"
+            editMode="row"
+            [scrollable]="true"
+            [(selection)]="selectedTableQR"
+            [totalRecords]="totalRecords"
+        >
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto *:*:text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" [outlined]="true"
+                                  severity="secondary" icon="pi pi-filter-slash" (click)="clear(dt)" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                                  [label]="this.valLanguage.btn_ShowFilter[this.optionLanguage]"
+                                  (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[this.optionLanguage]"
+                                  (click)="exportToExcel()" [outlined]="true" />
+                        <p-button icon="pi pi-plus" [label]="this.valLanguage.btn_Create[this.optionLanguage]"
+                                  (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input
+                            pInputText
+                            class="w-full"
+                            type="text"
+                            (input)="onGlobalFilter($event, dt)"
+                            [title]="this.valLanguage.searchByManufacturerInformation[this.optionLanguage]"
+                            [placeholder]="this.valLanguage.searchByManufacturerInformation[this.optionLanguage]"
+                        />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header let-columns>
+                <tr>
+                    <th pFrozenColumn>
+                        <p-button icon="pi pi-trash" [rounded]="true" severity="danger" />
+                    </th>
+                    <th pFrozenColumn>
+                        <div class="flex justify-center">
+                            <p-button icon="pi pi-file-edit" [rounded]="true" severity="info" />
+                        </div>
+                    </th>
+                    <th [pSortableColumn]="col.field" *ngFor="let col of columns">
+                        <div class="flex items-center gap-2 header-content">
+                            {{ col.header }}
+                            <p-sortIcon [field]="col.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th></th>
+                    @for (col of columns; track $index) {
+                        <th>
+                            <p-columnFilter type="text" [field]="col.field" [placeholder]="'Search by '+col.header"
+                                            [ariaLabel]="'Filter'+col.header"></p-columnFilter>
+                        </th>
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-editing="editing" let-ri="rowIndex">
+                <tr [pEditableRow]="information">
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <p-button icon="pi pi-trash" rounded text
+                                      severity="danger" (click)="confirmDelete($event, information)" />
+                        </div>
+                    </td>
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <p-button [rounded]="true" severity="info" [outlined]="true" pButton
+                                      pRipple pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(information)"
+                                      text rounded></p-button>
+                        </div>
+                    </td>
+                    <td *ngFor="let col of columns"> {{ information[col.field] }}</td>
+                </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="13">No customers found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-dialog
+        [header]="isEdit ? valLanguage.btn_UpdateManufacturerInformation[optionLanguage] : valLanguage.btn_CreateManufacturerInformation[optionLanguage]"
+        [(visible)]="isOpenDialog" modal resizable draggable>
+        <form
+            class="needs-validation rounded items-start grid grid-cols-2 mt-5 gap-x-4 gap-y-8 mb-3"
+            novalidate
+            [formGroup]="addManForm"
+            *ngIf="addManForm"
+            (ngSubmit)="isEdit ? updateManuFac(addManForm) : createManuFac(addManForm)"
+        >
+            <!--            <p-floatlabel class="w-64 mt-6">-->
+            <!--                <input class="w-full" pInputText id="over_label" readonly maxlength="10" formControlName="inputCode"-->
+            <!--                       autocomplete="off" />-->
+            <!--                <label for="over_label">Code</label>-->
+            <!--            </p-floatlabel>-->
+            <p-floatlabel>
+                <input class="w-full" pInputText id="name" formControlName="inputName" autocomplete="off" />
+                <label for="over_label">{{ this.valLanguage.grid_Name[this.optionLanguage] }}</label>
+            </p-floatlabel>
+            <p-floatlabel>
+                <input class="w-full" pInputText id="brand_name" formControlName="inputBrandName" autocomplete="off" />
+                <label for="over_label">{{ this.valLanguage.grid_Brand_Name[this.optionLanguage] }}</label>
+            </p-floatlabel>
+            <p-floatlabel class="col-span-2">
+                <input class="w-full" pInputText id="descrption" formControlName="inputDescription"
+                       autocomplete="off" />
+                <label for="over_label">{{ this.valLanguage.grid_Description[this.optionLanguage] }}</label>
+            </p-floatlabel>
+        </form>
+
+        <div class="mt-10 w-full">
+
+            <p-button
+                label="{{isEdit ? this.valLanguage.btn_UpdateManufacturerInformation[this.optionLanguage] : this.valLanguage.btn_CreateManufacturerInformation[this.optionLanguage]}}"
+                variant="outlined" severity="warn" class="w-full *:w-full"
+                (click)="isEdit ? updateManuFac(addManForm) : createManuFac(addManForm)"
+            />
+        </div>
+
+    </p-dialog>
+
+    <!--        <div class="card">-->
+    <!--            <div class="flex flex-wrap gap-x-4 mb-3">-->
+    <!--                <h4>{{this.valLanguage.nameCreateManufacturerInformation[this.optionLanguage]}}</h4>-->
+    <!--                <p-button label="{{this.valLanguage.btn_CreateManufacturerInformation[this.optionLanguage]}}" class="ml-auto" variant="outlined" severity="warn" (click)="createManuFac(addManForm)" />-->
+    <!--            </div>-->
+    <!--            <form-->
+    <!--                class="needs-validation rounded items-start grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-3 box p-5 *:mt-3 bottom-border-card"-->
+    <!--                novalidate-->
+    <!--                [formGroup]="addManForm"-->
+    <!--                *ngIf="addManForm"-->
+    <!--                (ngSubmit)="createManuFac(addManForm)"-->
+    <!--            >-->
+    <!--                &lt;!&ndash; <p-floatlabel class="w-64 mt-6">-->
+    <!--                    <input class="w-full" pInputText id="over_label" readonly maxlength="10" formControlName="inputCode" autocomplete="off" />-->
+    <!--                    <label for="over_label">Code</label>-->
+    <!--                </p-floatlabel> &ndash;&gt;-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="name" formControlName="inputName" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Name[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="brand_name" formControlName="inputBrandName" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Brand_Name[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="phone_number" formControlName="inputPhoneNumber" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Phone_Number[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="address" formControlName="inputAddress" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Address[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="website" formControlName="inputWebsite" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Website[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-floatlabel>-->
+    <!--                    <input class="w-full" pInputText id="descrption" formControlName="inputDescription" autocomplete="off" />-->
+    <!--                    <label for="over_label">{{this.valLanguage.grid_Description[this.optionLanguage]}}</label>-->
+    <!--                </p-floatlabel>-->
+    <!--                <p-fileupload class="sm:col-span-2" name="myfile[]" [multiple]="true" accept="image/*" maxFileSize="1000000" (onUpload)="onTemplatedUpload()" (onSelect)="onSelectedFiles($event)">-->
+    <!--                    <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">-->
+    <!--                        <div class="flex flex-wrap justify-between items-center">-->
+    <!--                            <label class="mr-5">{{this.valLanguage.grid_Choose_File[this.optionLanguage]}}</label>-->
+    <!--                            <p-button class="mr-5" (onClick)="choose($event, chooseCallback)" icon="pi pi-images" [rounded]="true" [outlined]="true" />-->
+    <!--                            <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true" severity="danger" [disabled]="!files || files.length === 0" />-->
+    <!--                        </div>-->
+    <!--                    </ng-template>-->
+    <!--                    <ng-template #empty>-->
+    <!--                        <p class="">{{this.valLanguage.grid_Drag_Drop_Files[this.optionLanguage]}}</p>-->
+    <!--                    </ng-template>-->
+    <!--                </p-fileupload>-->
+    <!--            </form>-->
+    <!--        </div>-->
+</section>

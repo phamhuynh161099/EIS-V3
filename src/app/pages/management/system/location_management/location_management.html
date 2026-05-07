@@ -1,0 +1,277 @@
+<section class="flex flex-col min-h-full w-full">
+    <p-toast />
+    <div class="header-title">
+        <h2 class="mb-0 text-2xl sm:text-3xl mr-auto">{{this.valLanguage.LocationManagement[this.optionLanguage]}}</h2>
+    </div>
+
+    <section class="card-2 p-[5px] md:p-[20px] flex-1]">
+        <p-table #dt1 class="table_minheight" [scrollable]="true" scrollHeight="600px" virtualScrollItemSize="600"
+            [loading]="loadingTable" [columns]="cols" [value]="data" [paginator]="true" [rows]="50"
+            [showCurrentPageReport]="true" exportFilename="User Management" [exportHeader]="'customExportHeader'"
+            [tableStyle]="{ 'min-width': '50rem' }" (sortFunction)="customSort($event)" [customSort]="true"
+            [totalRecords]="totalRecords" [globalFilterFields]="['lct_cd', 'mn_full', 're_mark']"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [first]="first"
+            [rowsPerPageOptions]="[50, 100, 200]">
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-3">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [label]="this.valLanguage.btn_ClearFilter[this.optionLanguage]" severity="secondary"
+                            [outlined]="true" icon="pi pi-filter-slash" (click)="onClearTable(dt1)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[this.optionLanguage]"
+                            (click)="exportToExcel()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            [label]="this.valLanguage.btn_ShowFilter[optionLanguage]" (click)="showFilter()"></p-button>
+                    </div>
+                    <div class="flex-1 flex-col md:flex-row flex gap-4">
+                        <p-iconfield iconPosition="left" class="btn_search_global flex-1">
+                            <p-inputicon>
+                                <i class="pi pi-search"></i>
+                            </p-inputicon>
+                            <input pInputText type="text" class="w-full" (input)="global_sv.onGlobalFilter($event, dt1)"
+                                title="{{this.valLanguage.searchByLocationManagement[this.optionLanguage]}}"
+                                placeholder="{{this.valLanguage.searchByLocationManagement[this.optionLanguage]}}" />
+                        </p-iconfield>
+                        <p-button icon="pi pi-plus"
+                            label="{{this.valLanguage.btn_Add_New_Root_Location[this.optionLanguage]}}" class="ml-auto"
+                            severity="warn" (click)="openAddNew()" [outlined]="false" />
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #header pTemplate="header">
+                <tr>
+                    <th colspan="3"></th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{header.header}}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <!-- <th pFrozenColumn></th> -->
+                    <th colspan="3"></th>
+                    @for (col of cols; track col.field) {
+                    @if (col.type == 'Text') {
+                    <th><p-columnFilter matchMode="contains" type="text" [field]="col.field"
+                            [placeholder]="loadingTable ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Number') {
+                    <th><p-columnFilter type="numeric" [field]="col.field"
+                            [placeholder]="loadingTable ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter></th>
+                    } @else if (col.type == 'Date') {
+                    <th>
+                        <div class="flex justify-center item-center">
+                            <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                            <p-columnFilter type="date" [field]="col.field" display="menu" [showMatchModes]="true"
+                                [showOperator]="false" [showAddButton]="true">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-datepicker #calendar [ngModel]="value" (onSelect)="filter(calendar.value)"
+                                        (onInput)="setup(calendar.value, col.field)" [showButtonBar]="true"
+                                        [placeholder]="loadingTable ? 'Loading...Please wait!' : 'yyyy-MM-DD'"
+                                        [disabled]="loadingTable" dateFormat="yy-mm-dd">
+                                    </p-datepicker>
+                                </ng-template>
+                            </p-columnFilter>
+                        </div>
+                    </th>
+                    } @else if (col.type == 'Option') {
+                    <th>
+                        <p-columnFilter class="filter-option" [field]="col.field" matchMode="equals" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                @if (col.field == 'use_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="useYNTableFilterValue"
+                                    [options]="ysList" (onChange)="filter(useYNTableFilterValue)" optionValue="value"
+                                    filterBy="label" placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'mv_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="mvYNTableFilterValue" [options]="ysList"
+                                    (onChange)="filter(mvYNTableFilterValue)" optionValue="value" filterBy="label"
+                                    placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'mt_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="mtYNTableFilterValue" [options]="ysList"
+                                    (onChange)="filter(mtYNTableFilterValue)" optionValue="value" filterBy="label"
+                                    placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                                @if (col.field == 'rt_yn') {
+                                <p-select [loading]="loadingTable" [(ngModel)]="rtYNTableFilterValue" [options]="ysList"
+                                    (onChange)="filter(rtYNTableFilterValue)" optionValue="value" filterBy="label"
+                                    placeholder="Select One" [showClear]="true">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                }
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                <tr [ngClass]="{
+                                        'even-row': ri % 2 === 0,
+                                        'odd-row': ri % 2 === 1,
+                                        'selected-row': selectedRow === ri,
+                                        'clickable-row': true
+                                    }">
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <button pButton type="button" icon="pi pi-plus"
+                                (click)="onRowAddInit(information.lctno, ri)" text rounded severity="warn"></button>
+                        </div>
+                    </td>
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <button pButton type="button" icon="pi pi-pencil"
+                                (click)="onRowEditInit(information.lctno, ri)" text rounded severity="info"></button>
+                        </div>
+                    </td>
+                    <td aria-describedby="list_rn">{{ ri + 1 }}</td>
+                    <td *ngFor="let col of columns" class="text-nowrap">
+                        @if (col.field == 'use_yn' || col.field == 'rt_yn' || col.field == 'mt_yn' || col.field ==
+                        'mv_yn') {
+                        <p-tag [value]="information[col.field]" *ngIf="information[col.field]" class="w-[86px] !py-2"
+                            [severity]="global_sv.getUseYNColor(information[col.field])" />
+                        }
+                        @else {
+                        @if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd'){
+                        {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                        }
+                        @else{
+                        {{ information[col.field] }}
+                        }
+                        }
+                    </td>
+                </tr>
+
+            </ng-template>
+        </p-table>
+
+        <p-dialog [header]="selectedLctNo" [(visible)]="isShowDialog" class="h-[50rem] md:h-[50rem]"
+            [style]="{ width: '60rem' }">
+            <div class="space-y-7 md:h-auto !max-h-[100%]">
+
+                <div class="flex gap-2">
+                    <div class="*:grid flex-1 *:md:grid-cols-2 *:gap-7 *:md:gap-2 space-y-7 mt-5">
+                        <div>
+                            <p-floatlabel>
+                                <input class="w-full" id="username" pInputText [(ngModel)]="selectedLctName" />
+                                <label
+                                    for="username">{{this.valLanguage.grid_Location_Name[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <p-select inputId="screen_alarm_label" [filter]="true" class="w-full"
+                                    optionValue="value" optionLabel="label" [loading]="loadingTable"
+                                    [(ngModel)]="selectedLctSAP" [options]="lctSAPs" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                                    </ng-template>
+                                </p-select>
+                                <label
+                                    for="screen_alarm_label">{{this.valLanguage.grid_Location_SAP[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                        <div>
+                            <p-floatlabel>
+                                <input class="w-full" id="e_mail" pInputText [(ngModel)]="selectedManagerId" />
+                                <label for="e_mail">{{this.valLanguage.grid_Manager[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <input class="w-full" id="cell_nm" pInputText [(ngModel)]="selectedManagerNm"
+                                    [disabled]="true" />
+                                <label for="cell_nm">{{this.valLanguage.grid_Manager_Name[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
+
+                    <div class="*:grid *:md:grid-cols-2 *:gap-7 *:md:gap-2 space-y-7 mt-5">
+                        <div>
+                            <p-floatlabel>
+                                <p-select inputId="corp_label" class="w-[130px]" [loading]="loadingTable"
+                                    [disabled]="!isEdit" [(ngModel)]="selectedUseYN" [options]="ysList"
+                                    [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2" *ngIf="option.label"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                <label for="corp_label">{{this.valLanguage.grid_UseYN[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <p-select inputId="grade_label" class="w-[130px]" [loading]="loadingTable"
+                                    [(ngModel)]="selectedMtYN" [options]="ysList" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                <label
+                                    for="grade_label">{{this.valLanguage.grid_MaintenanceYN[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+
+                        <div>
+                            <p-floatlabel>
+                                <p-select inputId="screen_alarm_label" class="w-[130px]" [loading]="loadingTable"
+                                    [(ngModel)]="selectedMvYN" [options]="ysList" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                <label
+                                    for="screen_alarm_label">{{this.valLanguage.grid_MovementYN[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                            <p-floatlabel>
+                                <p-select inputId="mail_label" class="w-[130px]" [loading]="loadingTable"
+                                    [(ngModel)]="selectedRtYN" [options]="ysList" [showClear]="false">
+                                    <ng-template let-option #item>
+                                        <p-tag [value]="option.label" class="w-full !py-2"
+                                            [severity]="global_sv.getUseYNColor(option.value)" />
+                                    </ng-template>
+                                </p-select>
+                                <label for="mail_label">{{this.valLanguage.grid_RentalYN[this.optionLanguage]}}</label>
+                            </p-floatlabel>
+                        </div>
+                    </div>
+                </div>
+                <p-floatlabel>
+                    <textarea pTextarea id="over_label" [(ngModel)]="selectedRemark" rows="8"
+                        style="resize: none; width: 100%;" class="h-full"></textarea>
+                    <label for="over_label">{{this.valLanguage.grid_Remark[this.optionLanguage]}}</label>
+                </p-floatlabel>
+                <div class="flex justify-between items-center">
+                    <p-button icon="pi pi-refresh" aria-label="Refresh" (click)="onResetUpdate()"
+                        [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="info" />
+                    <div class="scroll-p-2 space-x-2">
+                        <p-button label="{{this.valLanguage.btn_Cancel[this.optionLanguage]}}" severity="secondary"
+                            (click)="onEditCancel()" />
+                        <p-button label="{{this.valLanguage.btn_Save[this.optionLanguage]}}" (click)="onSaved()" />
+                    </div>
+                </div>
+            </div>
+        </p-dialog>
+    </section>
+</section>

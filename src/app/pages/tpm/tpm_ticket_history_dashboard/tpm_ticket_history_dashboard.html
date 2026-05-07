@@ -1,0 +1,348 @@
+<p-toast />
+<p-confirmdialog />
+<section class="bg-red-300 overflow-y-scroll custom-main-wrapper bg-white p-2 space-y-2"
+    [style.minHeight.px]="boxHeight()">
+
+    <section id="block-filter" class="w-full">
+        <div class="relative rounded-2xl border border-gray-light bg-white p-4 shadow-md">
+
+            <div class="flex flex-wrap items-center gap-3 pr-12">
+
+                <div>
+                    <p class="uppercase text-3xl font-bold text-slate-600">Ticket History</p>
+                </div>
+
+            </div>
+
+            <div class="mt-2 flex justify-end border-t border-gray-light pt-3">
+                <div class="flex flex-wrap items-center gap-3 pr-12">
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <section id="block-table" class="mx-auto !rounded-2xl shadow-lg p-2 border border-gray-light"
+        [style.height.px]="boxHeightTable()" style="position: relative;">
+        <p-table styleClass="tbl-line-of-esp p-datatable-lg" #dt [value]="listLine" [paginator]="true" [rows]="50"
+            [rowsPerPageOptions]="[50, 100, 200]"
+            [globalFilterFields]="['line_esp_name', 'line_code', 'type', 'factory','engineer_esp_name', 'status_tracking', 'location']"
+            responsiveLayout="scroll" [scrollable]="true" scrollHeight="flex" paginatorDropdownAppendTo="body">
+
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-2">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [outlined]="true" [icon]="isShowFilter ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                            label="Show Filter" (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-plus" label="Add New" (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+
+                    <p-iconfield iconPosition="left" class="w-full sm:w-auto">
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Search..." class="w-full rounded-lg border-slate-300 sm:w-72" />
+                    </p-iconfield>
+
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id" class="!bg-slate-50 !text-slate-600">
+                        Id <p-sortIcon field="id" />
+                    </th>
+                    <th pSortableColumn="line_name" class="!bg-slate-50 !text-slate-600">
+                        Line Name/Code <p-sortIcon field="line_name" />
+                    </th>
+
+                    <th pSortableColumn="type" class="!bg-slate-50 !text-slate-600">
+                        WORKSHOP <p-sortIcon field="type" />
+                    </th>
+
+                    <th pSortableColumn="factory" class="!bg-slate-50 !text-slate-600">
+                        FACTORY <p-sortIcon field="factory" />
+                    </th>
+
+                    <th pSortableColumn="engineer_esp_name" class="!bg-slate-50 !text-slate-600">
+                        Engineer <p-sortIcon field="engineer_esp_name" />
+                    </th>
+
+                    <th pSortableColumn="created_at" class="!bg-slate-50 !text-slate-600 !w-30">
+                        TIME QUEUE <p-sortIcon field="created_at" />
+                    </th>
+
+                    <th pSortableColumn="timestamp1" class="!bg-slate-50 !text-slate-600">
+                        TIME REQUEST <p-sortIcon field="timestamp1" />
+                    </th>
+
+                    <th pSortableColumn="timestamp2" class="!bg-slate-50 !text-slate-600">
+                        TIME ACCEPT <p-sortIcon field="timestamp2" />
+                    </th>
+
+                    <th pSortableColumn="timestamp3" class="!bg-slate-50 !text-slate-600">
+                        TIME COMPLETE <p-sortIcon field="timestamp3" />
+                    </th>
+
+                    <th pSortableColumn="status_tracking" class="!bg-slate-50 !text-slate-600">
+                        STATUS <p-sortIcon field="status_tracking" />
+                    </th>
+
+                    <th pSortableColumn="location" class="!bg-slate-50 !text-slate-600">
+                        LOCATION <p-sortIcon field="location" />
+                    </th>
+
+                    <!-- <th class="!bg-slate-50 !text-slate-600 text-center">ACTION</th> -->
+
+                </tr>
+                <tr [hidden]="isShowFilter">
+                    <th>
+
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="line_name"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="type"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="factory"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="engineer_esp_name"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="created_at"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="timestamp1"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="timestamp2"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="timestamp3"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="status_tracking"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter type="text" matchMode="contains" field="location"
+                            [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                            ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-listLine let-ri="rowIndex">
+                <tr class="transition-colors hover:bg-slate-50/50">
+
+                    <td>
+                        <span class="font-medium text-slate-600">{{ listLine.id }}</span>
+                    </td>
+
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-slate-800">{{ listLine.line_esp_name }}</span>
+                                <span class="text-sm text-slate-500">{{ listLine.line_code }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="font-bold text-slate-600">{{ listLine.type }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-semibold text-slate-600">{{ listLine.factory }}</span>
+                    </td>
+
+                    <td>
+                        <span class="font-semibold text-slate-600">{{ listLine.engineer_esp_name }}</span>
+                    </td>
+
+                    <td>
+                        <span class="italic">{{ formatTime(listLine.created_at) }}</span>
+                    </td>
+                    <td>
+                        <span class="italic text-slate-600" style="color: red;">{{ formatTime(listLine.timestamp1) }}</span>
+                    </td>
+
+                    <td>
+                        <span class="italic text-slate-600" style="color: red;">{{ formatTime(listLine.timestamp2) }}</span>
+                    </td>
+
+                    <td>
+                        <span class="italic text-slate-600" style="color: green;">{{ formatTime(listLine.timestamp3) }}</span>
+                    </td>
+
+                    <td>
+                        <p-tag [value]="listLine.status_tracking" [severity]="getSeverity(listLine.status_tracking)"
+                            [rounded]="true" />
+                    </td>
+
+                    <td>
+                        <span class="ont-semibold italic text-slate-600">{{ listLine.location }}</span>
+                    </td>
+
+                    <!-- <td>
+                        <p-tag [value]="listLine.status" [severity]="getSeverity(listLine.status)"
+                            [rounded]="true" />
+                    </td> -->
+
+                    <!-- <td class="text-center">
+                        <div class="flex items-center justify-start gap-2">
+                            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+                                pTooltip="Edit" (click)="onRowEditInit(listLine, ri)" />
+                            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                                pTooltip="Remove" (click)="confirmRemove($event, listLine)" />
+
+
+                        </div>
+                    </td> -->
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-slate-500">
+                        <div class="flex flex-col items-center">
+                            <i class="pi pi-inbox mb-3 text-4xl text-slate-300"></i>
+                            <p>No Data Found.</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </section>
+
+    <p-dialog [(visible)]="isShowDialog" [header]="isEdit ? 'Edit Line' : 'Add New Line'" modal>
+        <div class="space-y-4 flex flex-col md:h-auto h-full !max-h-[100%]">
+
+
+            <div class="w-full h-1 bg-gray"></div>
+
+            <form class="space-y-7 flex-1  w-full" novalidate [formGroup]="addModelForm" *ngIf="addModelForm"
+                (ngSubmit)="isEdit ? onEditSaved() : createModel()">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-2 *:md:min-w-[300px] *:flex-1 gap-4 mt-14 sm:mt-0">
+
+                    <!-- <p-floatlabel variant="on">
+                        <p-select inputId="espDevice" class="w-full" [loading]="loading"
+                            formControlName="selectEspDevice" [options]="listEspDevice" filterBy="label" [filter]="true"
+                            [showClear]="false" appendTo="body">
+                            <ng-template let-option #item>
+
+                                @if (option.status === 'Active') {
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="danger"
+                                    icon="pi pi-times" />
+
+                                } @else {
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="success"
+                                    icon="pi pi-check" />
+                                }
+
+                            </ng-template>
+                        </p-select>
+                        <label for="espDevice">ESP Device</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <p-select inputId="espDevice" class="w-full" [loading]="loading" formControlName="selectLine"
+                            [options]="listAllLines" filterBy="label" [filter]="true" [showClear]="false"
+                            appendTo="body">
+                            <ng-template let-option #item>
+
+                                @if (option.status === 'Active') {
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="danger"
+                                    icon="pi pi-times" />
+
+                                } @else {
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="success"
+                                    icon="pi pi-check" />
+                                }
+
+                            </ng-template>
+                        </p-select>
+                        <label for="espDevice">Line</label>
+                    </p-floatlabel> -->
+                    <p-floatlabel variant="on">
+                        <input inputId="lineName" class="w-full" pInputText formControlName="selectLineName" />
+                        <label for="lineName">Line Name</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <input inputId="lineCode" class="w-full" pInputText formControlName="selectLineCode" />
+                        <label for="lineCode">Line Code</label>
+                    </p-floatlabel>
+
+
+                    <p-floatlabel variant="on">
+                        <p-select inputId="workshop" class="w-full" [loading]="loading" formControlName="selectWorkshop"
+                            [options]="arrayType" filterBy="label" [filter]="true" [showClear]="false" appendTo="body">
+                            <ng-template let-option #item>
+
+                                <p-tag [value]="option.label" class="w-full !py-2" />
+
+                            </ng-template>
+                        </p-select>
+                        <label for="workshop">Workshop</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <p-select inputId="factory" class="w-full" [loading]="loading" formControlName="selectFactory"
+                            [options]="arrFactories" filterBy="label" [filter]="true" [showClear]="false"
+                            appendTo="body">
+                            <ng-template let-option #item>
+
+                                <p-tag [value]="option.label" class="w-full !py-2" />
+
+                            </ng-template>
+                        </p-select>
+                        <label for="factory">Factory</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <input inputId="location" class="w-full" pInputText formControlName="selectLocation" />
+                        <label for="location">Location (more information)</label>
+                    </p-floatlabel>
+
+                </div>
+            </form>
+
+            <!-- <div class="w-full h-1 bg-gray"></div> -->
+
+            <div class="flex justify-between mt-auto items-center space-x-2">
+                <!-- <p-button icon="pi pi-refresh" (click)="onResetUpdate()"
+                    [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="info" /> -->
+                <div class="scroll-p-2 space-x-2 max-w-md flex-1 flex *:flex-1 *:*:w-full">
+                    <p-button label="Cancle" severity="secondary" (click)="onEditCancel()" />
+                    <p-button label="Save" (click)="isEdit ? onEditSaved() : createModel()" />
+
+                    <!-- <p-button (onClick)="show()" label="Show" /> -->
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</section>

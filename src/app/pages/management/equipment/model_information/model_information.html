@@ -1,0 +1,713 @@
+<section>
+    <p-toast />
+    <p-confirmdialog />
+    <div class="header-title">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3 xl:mb-0">
+            <h2 class="text-2xl sm:text-3xl mr-auto">{{ this.valLanguage.nameModelInformation[optionLanguage] }}</h2>
+            <div class="flex gap-2 *:w-[120px] *:*:w-full ml-auto">
+                <p-button severity="info" variant="outlined" icon="pi pi-search"
+                          [label]="this.valLanguage.btn_Search[optionLanguage]" (click)="filterChooseSearch()" />
+                <p-button [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="secondary"
+                          icon="pi pi-refresh" (click)="ngOnInit()" />
+            </div>
+        </div>
+        <div
+            class="grid grid-cols-1 md:grid-cols-3 rounded justify-around gap-7 *:space-y-7 box p-5 header-border-filter">
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <input class="w-full" pInputText [(ngModel)]="selectedCode" />
+                    <label for="username">{{ this.valLanguage.grid_Code[optionLanguage] }}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="manufacturer_label" [options]="manufacturers" [(ngModel)]="selectedManufacturer"
+                              [loading]="loading_filter" optionValue="value" [filter]="true" filterBy="label"
+                              [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="manufacturer_label">{{ this.valLanguage.grid_Manufacturer[optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <input class="w-full" pInputText [(ngModel)]="selectedName" />
+                    <label for="username">{{ this.valLanguage.grid_Name[optionLanguage] }}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select inputId="group_label" [options]="groups" (onChange)="onChangeGroup('filter')"
+                              [(ngModel)]="selectedGroup" [loading]="loading_filter" optionValue="value"
+                              filterBy="label" [filter]="true" [showClear]="true" class="w-full">
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="group_label">{{ this.valLanguage.grid_Group[optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+            <div>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <input class="w-full" pInputText [(ngModel)]="selectedDescription" />
+                    <label for="username">{{ this.valLanguage.grid_Description[optionLanguage] }}</label>
+                </p-floatlabel>
+                <p-floatlabel class="max-w-sm mx-auto">
+                    <p-select
+                        inputId="func_label"
+                        [options]="funcs"
+                        [(ngModel)]="selectedFunc"
+                        optionValue="value"
+                        filterBy="label"
+                        [filter]="true"
+                        [showClear]="true"
+                        [emptyMessage]="this.valLanguage.select_Function_emptyMessage[optionLanguage]"
+                        class="w-full"
+                    >
+                        <ng-template let-option #item>
+                            <div class="flex items-center gap-2 w-full">
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </div>
+                        </ng-template>
+                    </p-select>
+                    <label for="func_label">{{ this.valLanguage.grid_Function[optionLanguage] }}</label>
+                </p-floatlabel>
+            </div>
+        </div>
+    </div>
+    <p-toast />
+    <div class="card">
+        <p-table
+            #dt1
+            [value]="dataTable"
+            class="table_minheight"
+            scrollHeight="626px"
+            virtualScrollItemSize="626"
+            (sortFunction)="customSort($event)"
+            [customSort]="true"
+            exportFilename="QR Code Management"
+            showGridlines
+            [tableStyle]="{ 'min-width': '60rem' }"
+            [columns]="cols"
+            [exportHeader]="'customExportHeader'"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [loading]="loading"
+            [paginator]="true"
+            [rows]="rows"
+            [first]="first"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [globalFilterFields]="['md_cd', 'md_nm', 'mf_nm', 'group_nm']"
+            [scrollable]="true"
+            [totalRecords]="totalRecords"
+        >
+            <ng-template #caption>
+                <div class="flex flex-col xl:flex-row gap-2">
+                    <div class="flex flex-nowarp overflow-auto text-nowrap pb-2 sm:pb-0 gap-x-2 md:gap-x-3">
+                        <p-button [label]="this.valLanguage.btn_ClearFilter[optionLanguage]" [outlined]="true"
+                                  icon="pi pi-filter-slash" (click)="clear(dt1)" />
+                        <p-button icon="pi pi-external-link" [label]="this.valLanguage.btn_Export[optionLanguage]"
+                                  (click)="exportToExcel()" [outlined]="true" />
+                        <p-button [outlined]="true" [icon]="isVisible ? 'pi pi-unlock' : 'pi pi-lock-open'"
+                                  [label]="this.valLanguage.btn_ShowFilter[optionLanguage]"
+                                  (click)="ShowFilter()"></p-button>
+                        <p-button icon="pi pi-plus" [label]="this.valLanguage.btn_Create[this.optionLanguage]"
+                                  (click)="onRowCreateInit()" [outlined]="true" />
+                    </div>
+                    <p-iconfield iconPosition="left" class="flex-1">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input pInputText type="text" class="w-full" (input)="global_sv.onGlobalFilter($event, dt1)"
+                               [title]="this.valLanguage.searchByModelInformation[optionLanguage]"
+                               [placeholder]="this.valLanguage.searchByModelInformation[optionLanguage]" />
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <ng-template #header let-columns>
+                <tr>
+                    <th pFrozenColumn>
+                        <p-button icon="pi pi-trash" [rounded]="true" severity="danger" />
+                    </th>
+                    <th pFrozenColumn>
+                        <p-button icon="pi pi-file-edit" [rounded]="true" severity="info" />
+                    </th>
+                    <th *ngFor="let header of cols" [pSortableColumn]="header.field"
+                        class="sortable-header cursor-pointer">
+                        <div class="header-content">
+                            <span>{{ header.header }}</span>
+                            <p-sortIcon [field]="header.field" />
+                        </div>
+                    </th>
+                </tr>
+                <tr [hidden]="isVisible">
+                    <th></th>
+                    @for (col of cols; track col.field) {
+                        @if (col.type == 'Text') {
+                            <th>
+                                <p-columnFilter type="text" matchMode="contains" [field]="col.field"
+                                                [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                                                ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                            </th>
+                        } @else if (col.type == 'Number') {
+                            <th>
+                                <p-columnFilter type="numeric" [field]="col.field"
+                                                [placeholder]="loading ? 'Loading...Please wait!' : 'Type to search'"
+                                                ariaLabel="Filter Name" filterOn="input"></p-columnFilter>
+                            </th>
+                        } @else if (col.type == 'Date') {
+                            <th>
+                                <div class="flex justify-center item-center">
+                                    <label class="w-32 opacity-55 self-center">Search By Date:</label>
+                                    <p-columnFilter type="date" [field]="col.field" display="menu"
+                                                    [showMatchModes]="true" [showOperator]="false"
+                                                    [showAddButton]="true">
+                                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                            <p-datepicker
+                                                #calendar
+                                                [ngModel]="value"
+                                                (onSelect)="filter(calendar.value)"
+                                                (onInput)="setup(calendar.value, col.field)"
+                                                [showButtonBar]="true"
+                                                [placeholder]="loading ? 'Loading...Please wait!' : 'Choose Date'"
+                                                [disabled]="loading"
+                                                dateFormat="yy-mm-dd"
+                                            >
+                                            </p-datepicker>
+                                        </ng-template>
+                                    </p-columnFilter>
+                                </div>
+                            </th>
+                        } @else if (col.type == 'MultiSelect') {
+                            <th>
+                                <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false"
+                                                [showClearButton]="false">
+                                    <ng-template #filter let-value let-filter="filterCallback">
+                                        @if (col.field == 'prt_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="true"
+                                                [selectAll]="selectAllPrtNmTable"
+                                                [(ngModel)]="prt_nmTableFilterValue"
+                                                (onChange)="filter(prt_nmTableFilterValue)"
+                                                optionLabel="label"
+                                                [loading]="loading"
+                                                optionValue="label"
+                                                [virtualScroll]="true"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-52"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'prt_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_prt_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'mf_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="true"
+                                                [selectAll]="selectAllMfNmTable"
+                                                [(ngModel)]="mf_nmTableFilterValue"
+                                                (onChange)="filter(mf_nmTableFilterValue)"
+                                                optionLabel="value"
+                                                [loading]="loading"
+                                                optionValue="value"
+                                                [virtualScroll]="true"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-72"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'mf_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_mf_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'group_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="true"
+                                                [selectAll]="selectAllGroupNmTable"
+                                                [(ngModel)]="group_nmTableFilterValue"
+                                                (onChange)="filter(group_nmTableFilterValue)"
+                                                optionLabel="label"
+                                                [loading]="loading"
+                                                optionValue="label"
+                                                [virtualScroll]="true"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-96"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'group_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_group_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'func_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="true"
+                                                [selectAll]="selectAllFuncNmTable"
+                                                [(ngModel)]="func_nmTableFilterValue"
+                                                (onChange)="filter(func_nmTableFilterValue)"
+                                                optionLabel="label"
+                                                [loading]="loading"
+                                                optionValue="label"
+                                                [virtualScroll]="true"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-96"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'func_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_func_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'elect_unit_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="false"
+                                                [selectAll]="selectAllElectUnitNmTable"
+                                                [(ngModel)]="elect_unit_nmTableFilterValue"
+                                                (onChange)="filter(elect_unit_nmTableFilterValue)"
+                                                optionLabel="value"
+                                                [loading]="loading"
+                                                optionValue="value"
+                                                [virtualScroll]="true"
+                                                [filter]="false"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-10"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'elect_unit_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_elect_unit_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'ecst_unit_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="false"
+                                                [selectAll]="selectAllEcstUnitNmTable"
+                                                [(ngModel)]="ecst_unit_nmTableFilterValue"
+                                                (onChange)="filter(ecst_unit_nmTableFilterValue)"
+                                                optionLabel="value"
+                                                [loading]="loading"
+                                                optionValue="value"
+                                                [virtualScroll]="true"
+                                                [filter]="false"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-10"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'ecst_unit_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_ecst_unit_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                        @if (col.field == 'wgt_unit_nm') {
+                                            <p-multiselect
+                                                [options]="listOption[col.field]"
+                                                variant="outlined"
+                                                [showToggleAll]="false"
+                                                [selectAll]="selectAllWgtUnitNmTable"
+                                                [(ngModel)]="wgt_unit_nmTableFilterValue"
+                                                (onChange)="filter(wgt_unit_nmTableFilterValue)"
+                                                optionLabel="value"
+                                                [loading]="loading"
+                                                optionValue="value"
+                                                [virtualScroll]="true"
+                                                [filter]="false"
+                                                [virtualScrollItemSize]="30"
+                                                class="multiselect-custom-virtual-scroll max-w-full min-w-10"
+                                                placeholder="Select Multiple"
+                                                (onSelectAllChange)="onSelectAllChangeTable($event, 'wgt_unit_nm')"
+                                                [maxSelectedLabels]="2"
+                                                styleClass="w-full"
+                                                #ms_wgt_unit_nm
+                                            >
+                                                <ng-template #headercheckboxicon let-allSelected
+                                                             let-partialSelected="partialSelected">
+                                                    <i class="pi pi-check" *ngIf="allSelected"></i>
+                                                    <i class="pi pi-minus" *ngIf="partialSelected"
+                                                       [ngStyle]="{ color: 'var(--text-color)' }"></i>
+                                                </ng-template>
+                                            </p-multiselect>
+                                        }
+                                    </ng-template>
+                                </p-columnFilter>
+                            </th>
+                        } @else {
+                            <th></th>
+                        }
+                    }
+                </tr>
+            </ng-template>
+            <ng-template #body let-information let-columns="columns" let-ri="rowIndex">
+                <tr
+                    [ngClass]="{
+                        'even-row': ri % 2 === 0,
+                        'odd-row': ri % 2 === 1,
+                        'selected-row': selectedRow === ri,
+                        'clickable-row': true
+                    }"
+                    (click)="onRowClick(ri)"
+                >
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <p-button icon="pi pi-trash" text rounded severity="danger"
+                                      (click)="confirmDelete($event, information)" />
+                        </div>
+                    </td>
+                    <td pFrozenColumn>
+                        <div class="flex items-center justify-center gap-2">
+                            <button pButton type="button" icon="pi pi-pencil" (click)="onRowEditInit(information, ri)"
+                                    text rounded severity="info"></button>
+                        </div>
+                    </td>
+                    <td *ngFor="let col of columns" class="text-nowrap">
+                        @if (col.field !== 'reg_dt_ymd' && col.field !== 'photo_file' && col.field !== 'md_cd' && col.field !== 'reg_nm' && col.field !== 'tp_nm' && col.field !== 'prt_nm' && col.field !== 'chg_nm' && col.field !== 'chg_dt_ymd') {
+                            @if (col.field == 'mf_nm' || col.field == 'ecst_unit_nm' || col.field == 'elect_unit_nm' || col.field == 'wgt_unit_nm' || col.field == 'group_nm' || col.field == 'func_nm') {
+                                @if (col.field != 'group_nm' && col.field != 'func_nm') {
+                                    {{ information[col.field] }}
+                                } @else {
+                                    <p-tag [value]="information[col.field]" class="w-full !py-2" severity="secondary" />
+                                }
+                            } @else if (col.field == 'wgt' || col.field == 'elect' || col.field == 'e_cst' || col.field == 'dimension') {
+                                {{ information[col.field] == 0 ? '' : information[col.field] }}
+                            } @else {
+                                {{ information[col.field] }}
+                            }
+                        } @else {
+                            @if (col.field === 'photo_file') {
+                                <div class="flex">
+                                    <p-image
+                                        onerror="this.src=`../../../../../assets/image/no-image.jpeg`"
+                                        [src]="'https://ams.hsvina.com/'+information[col.field] ? 'https://ams.hsvina.com/'+information[col.field] : '../../../../../assets/image/img_not_available.png'"
+                                        alt=""
+                                        class="*:max-w-10 *:max-h-10 *:flex *:justify-center mx-auto *:aspect-square"
+                                        [preview]="true"
+                                    />
+                                </div>
+                            } @else if (col.field == 'reg_dt_ymd' || col.field == 'chg_dt_ymd') {
+                                {{ information[col.field] | date: 'yyyy/MM/dd HH:mm:ss' }}
+                            } @else {
+                                {{ information[col.field] }}
+                            }
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+                <tr>
+                    <td colspan="13">No Information found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <!--    <div class="card">-->
+    <!--        <div class="flex flex-col md:flex-row justify-between sm:items-center mb-3">-->
+    <!--            <h4 class="text-2xl sm:text-3xl mr-auto"-->
+    <!--                auto>{{ this.valLanguage.nameCreateModelInformation[optionLanguage] }}</h4>-->
+    <!--            <p-button [label]="this.valLanguage.btn_CreateModel[optionLanguage]" class="flex justify-end"-->
+    <!--                      variant="outlined" severity="warn" (click)="createModel()" />-->
+    <!--        </div>-->
+    <!--        <form-->
+    <!--            class="needs-validation rounded grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 pt-8 p-5 gap-5 *:space-y-7 bottom-border-card"-->
+    <!--            novalidate-->
+    <!--            [formGroup]="addModelForm"-->
+    <!--            *ngIf="addModelForm"-->
+    <!--            (ngSubmit)="createModel()"-->
+    <!--        >-->
+    <!--            <div>-->
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 *:flex-1 max-w-lg mx-auto gap-3">-->
+    <!--                    <p-floatlabel class="w-full md:max-w-sm mx-auto">-->
+    <!--                        <input inputId="code_label" type="text" pInputText formControlName="inputCode"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label for="code_label">{{ this.valLanguage.grid_Code[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="w-full md:max-w-sm">-->
+    <!--                        <input inputId="name_label" type="text" pInputText formControlName="inputName"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label for="name_label">{{ this.valLanguage.grid_Name[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 *:flex-1 max-w-lg mx-auto gap-3">-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <input inputId="electronic_input_label" type="text" pInputText-->
+    <!--                               formControlName="inputElectronicInput" autocomplete="off" class="w-full" />-->
+    <!--                        <label-->
+    <!--                            for="electronic_input_label">{{ this.valLanguage.grid_Electronic_Input[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <p-select inputId="electronic_unit_label" class="w-full" formControlName="inputElectronicUnit"-->
+    <!--                                  autocomplete="off" [options]="eUnits" [showClear]="true">-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label-->
+    <!--                            for="electronic_unit_label">{{ this.valLanguage.grid_Electronic_Unit[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 *:flex-1 max-w-lg mx-auto gap-3">-->
+    <!--                    <p-floatlabel class="md:max-w-sm mx-auto w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <input inputId="weight_label" type="text" pInputText formControlName="inputWeight"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label for="weight_label">{{ this.valLanguage.grid_Weight[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <p-select inputId="weight_unit_label" class="w-full" [loading]="loading"-->
+    <!--                                  formControlName="inputWeightUnit" autocomplete="off" [options]="wts"-->
+    <!--                                  [showClear]="true">-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label for="weight_unit_label">{{ this.valLanguage.grid_Weight_Unit[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+    <!--            </div>-->
+
+    <!--            <div>-->
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 max-w-lg mx-auto">-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full mt-2.5 md:mt-0 md:shrink-0 md:w-1/2 md:pr-[6px]">-->
+    <!--                        <p-select inputId="manufacturer_label" class="w-full" [loading]="loading" [filter]="true"-->
+    <!--                                  filterBy="label" formControlName="inputManufacturer" autocomplete="off"-->
+    <!--                                  [options]="manufacturers" [showClear]="true">-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label for="manufacturer_label">{{ this.valLanguage.grid_Manufacturer[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2 md:pl-[6px]">-->
+    <!--                        <p-select inputId="group_label" class="w-full" [loading]="loading"-->
+    <!--                                  (onChange)="onChangeGroup('cre')" [filter]="true" filterBy="label"-->
+    <!--                                  formControlName="inputGroup" autocomplete="off" [options]="groups" [showClear]="true">-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label for="group_label">{{ this.valLanguage.grid_Group[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 *:flex-1 max-w-lg mx-auto gap-3">-->
+    <!--                    <p-floatlabel class="md:max-w-sm mx-auto w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <input inputId="e_consumption_label" type="text" pInputText formControlName="inputEConsumption"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label-->
+    <!--                            for="e_consumption_label">{{ this.valLanguage.grid_EConsumption[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <p-select inputId="e_consumption_unit_label" class="w-full" [loading]="loading"-->
+    <!--                                  formControlName="inputEConsumptionUnit" autocomplete="off" [options]="eConsumpUnits"-->
+    <!--                                  [showClear]="true">-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label-->
+    <!--                            for="e_consumption_unit_label">{{ this.valLanguage.grid_EConsumption_Unit[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+    <!--                <div class="max-w-lg mx-auto">-->
+    <!--                    <p-floatlabel class="w-full">-->
+    <!--                        <input inputId="description_label" type="text" pInputText formControlName="inputDescription"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label for="description_label">{{ this.valLanguage.grid_Description[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+    <!--            </div>-->
+
+    <!--            <div>-->
+    <!--                <div class="flex flex-col md:flex-row gap-y-7 *:flex-1 max-w-lg mx-auto gap-3">-->
+    <!--                    <p-floatlabel class="md:max-w-sm mx-auto w-full mt-2.5 md:mt-0 md:shrink-0 md:w-1/2">-->
+    <!--                        <p-select-->
+    <!--                            inputId="func_label"-->
+    <!--                            class="w-full"-->
+    <!--                            [loading]="loading"-->
+    <!--                            [filter]="true"-->
+    <!--                            filterBy="label"-->
+    <!--                            formControlName="inputFunc"-->
+    <!--                            autocomplete="off"-->
+    <!--                            [options]="creFuncs"-->
+    <!--                            [emptyMessage]="this.valLanguage.select_Function_emptyMessage[optionLanguage]"-->
+    <!--                            [showClear]="true"-->
+    <!--                        >-->
+    <!--                            <ng-template let-option #item>-->
+    <!--                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />-->
+    <!--                            </ng-template>-->
+    <!--                        </p-select>-->
+    <!--                        <label for="func_label">{{ this.valLanguage.grid_Function[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                    <p-floatlabel class="md:max-w-xs w-full md:shrink-0 md:w-1/2">-->
+    <!--                        <input inputId="dimension_label" type="text" pInputText formControlName="inputDimension"-->
+    <!--                               autocomplete="off" class="w-full" />-->
+    <!--                        <label for="dimension_label">{{ this.valLanguage.grid_Dimension[optionLanguage] }}</label>-->
+    <!--                    </p-floatlabel>-->
+    <!--                </div>-->
+
+    <!--                <div class="mx-auto max-w-lg">-->
+    <!--                    <p-fileupload name="myfile[]" [multiple]="false" accept="image/*" maxFileSize="1000000"-->
+    <!--                                  (onUpload)="onTemplatedUpload()" (onSelect)="onSelectedFiles($event)">-->
+    <!--                        <ng-template #header let-files let-chooseCallback="chooseCallback"-->
+    <!--                                     let-clearCallback="clearCallback" let-uploadCallback="uploadCallback">-->
+    <!--                            <div class="flex flex-wrap justify-between items-center">-->
+    <!--                                <label class="mr-5">{{ this.valLanguage.grid_Choose_File[optionLanguage] }}</label>-->
+    <!--                                <p-button class="mr-5" (onClick)="choose($event, chooseCallback)" icon="pi pi-images"-->
+    <!--                                          [rounded]="true" [outlined]="true" />-->
+    <!--                                <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true"-->
+    <!--                                          [outlined]="true" severity="danger"-->
+    <!--                                          [disabled]="!files || files.length === 0" />-->
+    <!--                            </div>-->
+    <!--                        </ng-template>-->
+    <!--                        <ng-template #empty>-->
+    <!--                            <p class="">{{ this.valLanguage.grid_Drag_Drop_Files[optionLanguage] }}</p>-->
+    <!--                        </ng-template>-->
+    <!--                    </p-fileupload>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </form>-->
+    <!--    </div>-->
+
+    <p-dialog
+        [header]="isEdit ? this.valLanguage.nameUpdateModelInformation[optionLanguage] : this.valLanguage.nameCreateModelInformation[optionLanguage]"
+        [(visible)]="isShowDialog" modal>
+        <div class="space-y-7 flex flex-col md:h-auto h-full !max-h-[100%]">
+
+            <form
+                class="space-y-7 flex-1 overflow-y-auto w-full"
+                novalidate
+                [formGroup]="addModelForm"
+                *ngIf="addModelForm"
+                (ngSubmit)="isEdit ? onEditSaved() : createModel()"
+            >
+                <div class="grid sm:grid-cols-2 lg:grid-cols-5 *:md:min-w-56 *:flex-1 gap-2 mt-14 sm:mt-0">
+                    <p-floatlabel>
+                        <input class="w-full" id="md_cd" pInputText formControlName="inputCode"
+                               [readonly]="isEdit" />
+                        <label for="md_cd">{{ this.valLanguage.grid_Code[optionLanguage] }}</label>
+                    </p-floatlabel>
+                    <p-floatlabel>
+                        <input class="w-full" id="md_nm" pInputText formControlName="inputName" />
+                        <label for="md_nm">{{ this.valLanguage.grid_Name[optionLanguage] }}</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel>
+                        <p-select inputId="manufact" class="w-full" [loading]="loading"
+                                  formControlName="inputManufacturer" [options]="manufacturers"
+                                  filterBy="label" [filter]="true" [showClear]="false">
+                            <ng-template let-option #item>
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </ng-template>
+                        </p-select>
+                        <label for="manufact">{{ this.valLanguage.grid_Manufacturer[optionLanguage] }}</label>
+                    </p-floatlabel>
+                    <p-floatlabel>
+                        <p-select inputId="group" class="w-full select_group" [loading]="loading"
+                                  formControlName="inputGroup" [options]="groups" filterBy="label"
+                                  [filter]="true" [showClear]="false" (onChange)="onChangeUpdGroup()">
+                            <ng-template let-option #item>
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </ng-template>
+                        </p-select>
+                        <label for="group">{{ this.valLanguage.grid_Group[optionLanguage] }}</label>
+                    </p-floatlabel>
+                    <p-floatlabel>
+                        <p-select inputId="func" class="w-full select_right" [loading]="loading"
+                                  formControlName="inputFunc" [options]="func_nm_upd" [showClear]="false">
+                            <ng-template let-option #item>
+                                <p-tag [value]="option.label" class="w-full !py-2" severity="secondary" />
+                            </ng-template>
+                        </p-select>
+                        <label for="func">{{ this.valLanguage.grid_Function[optionLanguage] }}</label>
+                    </p-floatlabel>
+                </div>
+
+                <p-floatlabel>
+                    <textarea pTextarea id="description_label" formControlName="inputDescription" rows="8"
+                              style="resize: none; width: 100%" class="h-full"></textarea>
+                    <label for="description_label">{{ this.valLanguage.grid_Description[optionLanguage] }}</label>
+                </p-floatlabel>
+                <div></div>
+                <p-fileupload name="myfile[]" [multiple]="false" accept="image/*" maxFileSize="1000000"
+                              (onUpload)="onTemplatedUpload()" (onSelect)="onSelectedFilesUpdate($event)">
+                    <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
+                                 let-uploadCallback="uploadCallback">
+                        <div class="flex flex-wrap justify-between items-center">
+                            <label class="mr-5">{{ this.valLanguage.grid_Choose_File[optionLanguage] }}</label>
+                            <p-button class="mr-5" (onClick)="choose($event, chooseCallback)" icon="pi pi-images"
+                                      [rounded]="true" [outlined]="true" />
+                        </div>
+                    </ng-template>
+                    <ng-template #empty>
+                        <p class="">{{ this.valLanguage.grid_Drag_Drop_Files[optionLanguage] }}</p>
+                    </ng-template>
+                </p-fileupload>
+            </form>
+
+            <div class="flex justify-between mt-auto items-center space-x-2">
+                <p-button icon="pi pi-refresh" (click)="onResetUpdate()"
+                          [label]="this.valLanguage.btn_Refresh[optionLanguage]" severity="info" />
+                <div class="scroll-p-2 space-x-2 max-w-md flex-1 flex *:flex-1 *:*:w-full">
+                    <p-button [label]="this.valLanguage.btn_Cancel[optionLanguage]" severity="secondary"
+                              (click)="onEditCancel()" />
+                    <p-button [label]="this.valLanguage.btn_Save[optionLanguage]"
+                              (click)="isEdit ? onEditSaved() : createModel()" />
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</section>

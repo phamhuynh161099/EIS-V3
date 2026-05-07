@@ -1,0 +1,19 @@
+.p-datatable-tbody > tr > td{
+    padding: 5px!important;
+}
+
+p-table:not(#auth-1, #auth-2) {
+    th, td { white-space: nowrap; }
+
+    tbody > tr {
+        &:hover {
+            background-color: var(--p-datatable-row-selected-background) !important;
+            color: var(--p-datatable-row-selected-color) !important;
+        }
+
+        @media (640px < width) {
+            height: 40px;
+            line-height: 20px;
+        }
+    }
+}
