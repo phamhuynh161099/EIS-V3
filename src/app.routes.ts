@@ -54,7 +54,7 @@ export const appRoutes: Routes = [
                 canActivate: [AuthGuard]
             },
             {
-                path: 'pages',
+                path: 'pages-free',
                 loadChildren: () => import('./app/pages/publicity/publicity.routes'),
                 canActivate: [AuthGuard]
             },
@@ -66,6 +66,13 @@ export const appRoutes: Routes = [
             {
                 path: 'mgt',
                 loadChildren: () => import('./app/pages/management/system/system.routes'),
+                canActivate: [AuthGuard]
+            },
+
+            //==========
+            {
+                path: 'pages',
+                loadChildren: () => import('./app/pages/pp-management/pp-management.route'),
                 canActivate: [AuthGuard]
             },
         ]

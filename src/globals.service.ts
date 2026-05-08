@@ -43,6 +43,8 @@ export class GlobalsService {
 
 
     checkTitleMenu(title: string) {
+        console.log('checkTitleMenu::',title)
+
         switch (title) {
             case '/equipmentmgt/equipmentInfo.do':
                 return equipment.Information;
@@ -127,6 +129,9 @@ export class GlobalsService {
                 return tmp.Tmp_Ticket_History_Dashboard;
             case '/tmp/tpm-engineer-management':
                 return tmp.Tmp_Engineer_Management;
+
+            case '/pages/pocompletiondashboard':
+                return '/pages/pocompletiondashboard';
             default:
                 return 'notfound';
         }

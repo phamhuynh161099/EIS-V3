@@ -1,4 +1,4 @@
-export const  equipment = {
+export const equipment = {
     QR_Code_Management: 'qrcodemanagement',
     Crud: 'crud',
     Qr_Scanner: 'qrscanner',
@@ -15,7 +15,7 @@ export const  equipment = {
     Model_Information: 'modelInfo.do',
 };
 
-export const  tmp = {
+export const tmp = {
     Tmp_Plan: 'tpmplan',
     Tmp_Report: 'tpmReport.do',
     Tmp_Activity_Hist: 'tpmActivityHist.do',
@@ -29,13 +29,13 @@ export const  tmp = {
     Tmp_Engineer_Management: 'tpm-engineer-management',
 };
 
-export const  location = {
+export const location = {
     Receiving_Management: 'locationreceivingmanagement',
     History: 'lctHist.do',
     Forwarding_Management: 'locationforwardingmanagement',
 };
 
-export const  system = {
+export const system = {
     User_Management: 'systemusermanagement',
     Common_Management: 'systemcommonmanagement',
     Menu_Management: 'systemmenumanagement',
@@ -51,3 +51,7 @@ export const  system = {
     TPM_Schedule_Master: 'systemtpmschedulemaster',
     Language_Category: 'systemlanguagecategory',
 };
+
+export const pp_management = {
+    PoCompletionDashboard: 'pocompletiondashboard'
+}
