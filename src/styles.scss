@@ -40,6 +40,10 @@
     }
 }
 
+
+/*
+ =============== CSS Custom Scrollbar ============
+*/
 /* 1. Tăng độ rộng của thanh cuộn */
 .tbl-line-of-esp .p-datatable-table-container::-webkit-scrollbar {
     width: 10px !important;
@@ -89,7 +93,6 @@
         background-color: rgba(144, 164, 174, 0.7) !important;
     }
 }
-
 
 
 // /====
@@ -143,7 +146,14 @@
     }
 }
 
-/* Add application styles & imports to this file! */
+/*
+ =============== CSS Custom Scrollbar ============
+*/
+
+
+/*
+ =============== CSS Custom Paramquery ============
+*/
 @import '~jquery-ui-pack/jquery-ui.css';
 @import '~jquery-ui-pack/jquery-ui.structure.css';
 @import '~jquery-ui-pack/jquery-ui.theme.css';
@@ -537,7 +547,7 @@ div.pq-theme select {
 .ui-icon-seek-first {
     margin-right: -7px;
     border-radius: 2px;
-    // background: url('../.././../assets/images/First_prev.png') center center no-repeat !important;
+    background: url('./assets/image/First_prev.png') center center no-repeat !important;
     background-color: #ffffff !important;
 }
 
@@ -545,7 +555,7 @@ div.pq-theme select {
 .ui-icon-seek-prev {
     margin-right: -5px;
     border-radius: 2px;
-    // background: url('../.././../assets/images/Prev.png') center center no-repeat !important;
+    background: url('./assets/image/Prev.png') center center no-repeat !important;
     background-color: #ffffff !important;
 }
 
@@ -553,7 +563,7 @@ div.pq-theme select {
 .ui-icon-seek-next {
     margin-left: -5px;
     border-radius: 2px;
-    // background: url('../.././../assets/images/Next.png') center center no-repeat !important;
+    background: url('./assets/image/Next.png') center center no-repeat !important;
     background-color: #ffffff !important;
 }
 
@@ -562,7 +572,7 @@ div.pq-theme select {
     margin-left: -7px;
     margin-right: 2px;
     border-radius: 2px;
-    // background: url('../.././../assets/images/Last_next.png') center center no-repeat !important;
+    background: url('./assets/image/Last_next.png') center center no-repeat !important;
     background-color: #ffffff !important;
 }
 
@@ -682,23 +692,23 @@ span.pq-from-to-center {
 
 // Background Image URL
 .ui-icon.reset {
-    // background-image: url('../../../assets/images/reset.png') !important;
+    background-image: url('./assets/image/reset.png') !important;
 }
 
 .ui-icon.refresh {
-    // background-image: url('../../../assets/images/refresh.png') !important;
+    background-image: url('./assets/image/refresh.png') !important;
 }
 
 .ui-icon.dday {
-    // background-image: url('../../../assets/images/add-dday.png') !important;
+    background-image: url('./assets/image/add-dday.png') !important;
 }
 
 .ui-icon.weekly {
-    // background-image: url('../../../assets/images/weekly-schedule.png') !important;
+    background-image: url('./assets/image/weekly-schedule.png') !important;
 }
 
 .ui-icon.export {
-    // background-image: url('../../../assets/images/export.png') !important;
+    background-image: url('./assets/image/export.png') !important;
     margin-left: -2px;
     margin-right: -8px;
     margin-top: 1px;
@@ -959,7 +969,7 @@ body {
 
 // Filter button
 .pq-filter-icon {
-    // background-image: url('../../../assets/images/icon_filter.png');
+    // background-image: url('./assets/image/icon_filter.png');
     border-radius: 2px;
     background-color: #ececec;
     background-repeat: no-repeat;
@@ -1022,7 +1032,7 @@ button:focus {
 
 // Link to new Edit icon
 .ui-icon-pencil {
-    // background: url('../.././../assets/images/edit_icon.png') center center no-repeat !important;
+    background: url('./assets/image/edit_icon.png') center center no-repeat !important;
 }
 
 .ui-widget-content {
@@ -1198,4 +1208,42 @@ div.pq-select-menu>.pq-select-option-label {
 // Click row highlight row Daily Production Status page
 .pq-state-select.pq-grid-row {
     color: orange;
+}
+
+/*
+ =============== CSS Custom Paramquery ============
+*/
+
+app-user-config {
+    #grid_user_config {
+        ::-webkit-scrollbar {
+            width: 12px !important;
+            height: 12px !important;
+            position: absolute;
+        }
+
+        .pq-grid-row {
+            &:hover {
+                .pq-grid-cell {
+                    background-color: #333 !important;
+                }
+
+                background-color: #333 !important;
+            }
+        }
+
+        .pq-grid-row:last-child>.pq-grid-col {
+            background-color: #4f535e;
+        }
+
+        .pq-editor-outer>.pq-editor-inner>textarea {
+            color: red !important;
+            background-color: white !important;
+        }
+
+        .pq-grid-cell>div {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
 }

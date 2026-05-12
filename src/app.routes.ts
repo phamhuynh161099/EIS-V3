@@ -75,6 +75,11 @@ export const appRoutes: Routes = [
                 loadChildren: () => import('./app/pages/pp-management/pp-management.route'),
                 canActivate: [AuthGuard]
             },
+            {
+                path: 'pages',
+                loadChildren: () => import('./app/pages/user-management/user-management.route'),
+                canActivate: [AuthGuard]
+            },
         ]
     },
     { path: 'landing', component: Landing },

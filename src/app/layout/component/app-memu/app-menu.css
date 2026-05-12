@@ -24,13 +24,13 @@
 }
 
 .menu-bar-parent .icon-menu {
-    color: #9ca3af; /* Màu icon mặc định */
+    /* color: #9ca3af; */
     transition: color 0.2s;
 }
 
 .menu-bar-parent .icon-arrow {
     font-size: 0.8rem;
-    color: #9ca3af;
+    /* color: #9ca3af; */
 }
 
 /* Hiệu ứng Hover */
@@ -39,13 +39,19 @@
     color: #1f2937;
 }
 .menu-bar-parent:hover .icon-menu {
-    color: #6b7280;
+    /* color: #6b7280; */
 }
 
 /* Hiệu ứng Active (Khi đang xổ xuống) */
 .menu-bar-parent.active {
-    background: #eff6ff; /* Xanh dương nhạt */
-    color: #2563eb; /* Chữ xanh dương đậm */
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.menu-bar-parent.active span {
+    background: #eff6ff;
+    color: #2563eb;
     font-weight: 600;
 }
 

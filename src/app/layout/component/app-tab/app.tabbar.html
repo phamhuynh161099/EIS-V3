@@ -1,0 +1,15 @@
+@if (tabService.tabs().length > 0) {
+<div class="tab-bar">
+    @for (tab of tabService.tabs(); track tab.id) {
+    <div class="tab-item" [class.active]="tab.id === tabService.activeTabId()" (click)="tabService.setActive(tab.id)">
+        @if (tab.icon) {
+        <i class="pi {{ tab.icon }}" style="font-size:13px"></i>
+        }
+        <span class="tab-title">{{ tab.title }}</span>
+        <button class="tab-close" (click)="tabService.closeTab(tab.id, $event)" aria-label="Đóng tab">
+            <i class="pi pi-times" style="font-size:10px"></i>
+        </button>
+    </div>
+    }
+</div>
+}

@@ -23,7 +23,7 @@ import { Toast, ToastModule } from 'primeng/toast';
 
 
 import { Textarea } from 'primeng/textarea';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { PoCompleteDashboardService } from './po-complete-dashboard.service';
 import { QrCodeGeneratorComponent } from '../../management/equipment/qr_code_manage/qr_code_generator';
 import { GlobalsService } from '../../../../globals.service';
@@ -31,6 +31,9 @@ import { Name_Language } from '../../../../constants/constants.auth';
 import { EquipmentService } from '../../management/equipment/equipment.service';
 import moment from 'moment';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TAB_BAR_HEIGHT } from '../../../../constants/constants.system';
+import { CustomReuseStrategy } from '../../../strategy/custom-reuse-strategy';
+import { ActivatedRoute, RouteReuseStrategy } from '@angular/router';
 
 /**
  * Param Query
@@ -71,6 +74,7 @@ declare var pq: any
 })
 export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
 
+    private unsubscribe$ = new Subject<void>();
     private service = inject(PoCompleteDashboardService);
 
     // // Define
@@ -140,7 +144,7 @@ export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
 
 
     // Signal lưu chiều cao
-    boxHeight = signal<number>(0);
+    boxHeight = signal<string>('0');
     // Signal lưu chiều cao của table
     boxHeightMainContent = 0;
     // chiều cao của filter
@@ -149,34 +153,60 @@ export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
     paddingTableAFilter = 24;
     private resizeObserver: ResizeObserver | null = null;
     constructor() {
-        afterNextRender(() => {
-            const layoutMainEl = document.querySelector('.layout-main') as HTMLElement;
-            this.boxHeightFilter = (document.querySelector('#block-filter') as HTMLElement).offsetHeight;
 
-            if (layoutMainEl) {
-                this.boxHeight.set(layoutMainEl.clientHeight);
-                this.boxHeightMainContent = (Math.max(layoutMainEl.clientHeight - this.boxHeightFilter - this.paddingTableAFilter, 400))
-
-                this.resizeObserver = new ResizeObserver(entries => {
-                    for (let entry of entries) {
-                        this.boxHeight.set(entry.contentRect.height);
-                        this.boxHeightMainContent = (Math.max(entry.contentRect.height - this.boxHeightFilter - this.paddingTableAFilter, 400))
-                    }
-                });
-
-                this.resizeObserver.observe(layoutMainEl);
-            }
-        });
     }
 
     ngOnInit(): void {
-
-
+        const layoutTopBar = document.querySelector('.layout-topbar') as HTMLElement
+        this.boxHeight.set(`calc(100vh - ${layoutTopBar.offsetHeight}px - ${TAB_BAR_HEIGHT}px)`);
     }
 
     ngAfterViewInit(): void {
-        this.InitGrid();
+        setTimeout(() => {
+            this.InitGrid();
+        }, 0);
         this.getCRD();
+
+        this.subscribeReuseEvents();
+
+    }
+
+    private reuseStrategy = inject(RouteReuseStrategy);
+    private isDetached = false; // track trạng thái detach
+    private activatedRoute = inject(ActivatedRoute);
+    private subscribeReuseEvents(): void {
+        const strategy = this.reuseStrategy as CustomReuseStrategy;
+
+        // ✅ Lấy key của route này để filter đúng event
+        const myKey = this.activatedRoute.snapshot.pathFromRoot
+            .map(r => r.url.map(u => u.toString()).join('/'))
+            .filter(Boolean)
+            .join('/');
+
+        strategy.onDetach$
+            .pipe(
+                takeUntil(this.unsubscribe$),
+                filter(key => key === myKey)
+            )
+            .subscribe(() => {
+                this.isDetached = true;
+            });
+
+        strategy.onAttach$
+            .pipe(
+                takeUntil(this.unsubscribe$),
+                filter(key => key === myKey)
+            )
+            .subscribe(() => {
+                this.isDetached = false;
+                if (this.grid) {
+                    // this.grid.option('dataModel.data', this.dataArticle);
+                    setTimeout(() => {
+                        this.grid.refreshDataAndView();
+                        this.grid.hideLoading();
+                    }, 0);
+                }
+            });
     }
 
     onSelectAll(items: any) {
@@ -593,12 +623,11 @@ export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
     ];
 
     InitGrid() {
-        let layoutMainHeight = (document.querySelector('.layout-main') as HTMLElement).clientHeight;
+        let layoutMainHeight = (document.querySelector('.block-wrapper') as HTMLElement).clientHeight;
         let boxHeightFilter = (document.querySelector('#block-filter') as HTMLElement).clientHeight;
-        let boxHeightMainContent = (Math.max(layoutMainHeight - boxHeightFilter - 36, 400))
+        let boxHeightMainContent = (Math.max(layoutMainHeight - boxHeightFilter - TAB_BAR_HEIGHT, 400))
 
         const $this = this;
-        console.log('height signal boxHeightMainContent', layoutMainHeight, boxHeightFilter, boxHeightMainContent)
 
         const obj: any = {
             showTop: false,
@@ -608,9 +637,6 @@ export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
                 minWidth: 40,
                 show: true,
             },
-            // width: '50%',
-            // width: '100%',
-            // width: auto,
             rowHt: 38.5,
             height: boxHeightMainContent,
             collapsible: {
@@ -862,17 +888,6 @@ export class PoCompleteDashboard implements OnInit, OnDestroy, AfterViewInit {
                 this.defaultDateSDD = moment(tempDate, 'YYYYMMDD').format('YYYYMMDD');
                 this.defaultDateSDD_inc = moment(tempDate_inc, 'YYYYMMDD').format('YYYYMMDD');
                 this.defaultDate = this.defaultDateSDD;
-
-
-                // Area set dafault date Mul // hidden 6/Sep/2023
-                // this.dropdownListSDD = this.arrMulSDD;
-                // this.defaultMulDateSDD.push({
-                //   sdd: moment(tempDate, 'YYYYMMDD').format('YYYYMMDD'),
-                //   sdd_date: moment(tempDate, 'YYYYMMDD').format('YYYY-MM-DD'),
-                // });
-                // this.selectedDefaultSDD = this.defaultMulDateSDD;
-                // this.selectedItems = this.defaultMulDateSDD;
-                // this.selectedSDD = this.defaultMulDateSDD;
                 // END: Area set dafault date Mul
 
                 // Area Option From To

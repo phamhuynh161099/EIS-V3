@@ -53,5 +53,10 @@ export const system = {
 };
 
 export const pp_management = {
-    PoCompletionDashboard: 'pocompletiondashboard'
+    PoCompletionDashboard: 'pocompletiondashboard',
+    NewArticle: 'newarticle',
+}
+
+export const user_management = {
+    UserConfig: "userconfig"
 }

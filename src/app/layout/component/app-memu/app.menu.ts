@@ -7,6 +7,7 @@ import { LanguageType, Name_Language, Name_Token } from '../../../../constants/c
 import { GlobalsService } from '../../../../globals.service';
 import { AuthService } from '../../../pages/auth/auth.service';
 import { AppMenuitem } from '../app.menuitem';
+import { TabService } from '../app-tab/tab.service';
 
 @Component({
     selector: 'app-menu',
@@ -134,6 +135,7 @@ export class AppMenu implements OnInit {
                 {
                     title: 'New Article',
                     link: '/pages/newarticle',
+                    // link: '/mgt/qrcodemanagement',
                 },
                 {
                     title: 'PO',
@@ -1124,7 +1126,8 @@ export class AppMenu implements OnInit {
 
     constructor(
         private globalsService: GlobalsService,
-        private menuService: AuthService
+        private menuService: AuthService,
+        private tabService: TabService
     ) {
         const lang = localStorage.getItem(Name_Language);
         if (lang) {
@@ -1160,24 +1163,29 @@ export class AppMenu implements OnInit {
      */
     mapStaticMenuToPrimeNg(staticItems: any[]): MenuItem[] {
         return staticItems
-            .filter(item => !item.hidden) // Bỏ qua các item bị ẩn
+            .filter(item => !item.hidden)
             .map(item => {
-                // PrimeNG format
                 const mappedItem: MenuItem = {
                     label: item.title,
-                    // Xử lý icon: Nếu icon của Nebular, chuyển tạm sang icon PrimeNG (pi pi-...)
-                    icon: item.icon ? `pi pi-fw pi-${this.convertIcon(item.icon)}` : undefined,
-                    routerLink: item.link ? [item.link] : undefined,
+                    icon: item.icon
+                        ? `pi pi-fw pi-${this.convertIcon(item.icon)}`
+                        : undefined,
+                    // ← BỎ routerLink, dùng command thay thế
                     visible: !item.hidden,
-                    expanded: false, // Trạng thái đóng/mở mặc định
+                    expanded: false,
                 };
 
-                // Nếu là thẻ tiêu đề (group)
                 if (item.group) {
-                    mappedItem['group'] = true; // Thêm custom property để HTML nhận diện separator
+                    mappedItem['group'] = true;
                 }
 
-                // Nếu có menu con, đệ quy gọi lại chính nó
+                // Leaf item có link → mở tab thay vì navigate thẳng
+                if (item.link && (!item.children || item.children.length === 0)) {
+                    mappedItem.command = () => {
+                        this.tabService.openTab(item.link, item.title, mappedItem.icon);
+                    };
+                }
+
                 if (item.children && item.children.length > 0) {
                     mappedItem.items = this.mapStaticMenuToPrimeNg(item.children);
                 }

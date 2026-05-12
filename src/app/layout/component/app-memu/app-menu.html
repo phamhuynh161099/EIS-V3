@@ -1,4 +1,4 @@
-<ul class="layout-menu">
+<!-- <ul class="layout-menu">
     <ng-container *ngFor="let item of menuPath; let i = index">
         <li *ngIf="item['group'] || item.separator" class="menu-separator">
              <span class="text-xs text-gray-400 font-bold uppercase tracking-wider ml-4 mb-2 block">
@@ -30,5 +30,58 @@
                 </div>
             </div>
         </li>
+    </ng-container>
+</ul> -->
+<ul class="layout-menu">
+    <ng-container *ngFor="let item of menuPath; let i = index">
+
+        <!-- Group separator -->
+        <li *ngIf="item['group'] || item.separator" class="menu-separator">
+            <span class="text-xs font-bold uppercase tracking-wider ml-4 mb-2 block text-black dark:text-white">
+                {{ item.label }}
+            </span>
+        </li>
+
+        <!-- Menu item bình thường -->
+        <li *ngIf="!item['group'] && !item.separator && item.visible !== false"
+            class="menu-list-item">
+
+            <!-- Có children → toggle expand, KHÔNG mở tab -->
+            <div *ngIf="item.items && item.items.length > 0"
+                 class="menu-bar-parent flex justify-between align-items-center"
+                 (click)="toggleMenu(item)"
+                 [class.active]="item.expanded">
+                <div class="flex align-items-center gap-3">
+                    <i *ngIf="item.icon" [class]="item.icon + ' text-lg icon-menu'"></i>
+                    <span class="font-medium text-sm text-black dark:text-white">{{ item.label }}</span>
+                </div>
+                <i class="pi pi-fw transition-transform duration-300 icon-arrow"
+                   [ngClass]="item.expanded ? 'pi-angle-up' : 'pi-angle-down'">
+                </i>
+            </div>
+
+            <!-- Không có children → leaf item, click mở tab -->
+            <div *ngIf="!item.items || item.items.length === 0"
+                 class="menu-bar-parent flex justify-between align-items-center cursor-pointer"
+                 (click)="item.command && item.command({})">
+                <div class="flex align-items-center gap-3">
+                    <i *ngIf="item.icon" [class]="item.icon + ' text-lg icon-menu'"></i>
+                    <span class="font-medium text-sm text-black dark:text-white">{{ item.label }}</span>
+                </div>
+            </div>
+
+            <!-- Submenu -->
+            <div *ngIf="item.items && item.items.length > 0"
+                 class="submenu-container"
+                 [class.submenu-expanded]="item.expanded">
+                <div class="submenu-inner">
+                    <div app-menuitem *ngIf="isButtonVisible && item.items"
+                         [item]="item" [index]="i" [root]="true"
+                         class="submenu-content">
+                    </div>
+                </div>
+            </div>
+        </li>
+
     </ng-container>
 </ul>

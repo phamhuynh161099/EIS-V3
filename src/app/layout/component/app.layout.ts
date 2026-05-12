@@ -6,21 +6,37 @@ import { LayoutService } from '../service/layout.service';
 import { AppFooter } from './app.footer';
 import { AppSidebar } from './app.sidebar';
 import { AppTopbar } from './app-topbar/app.topbar';
+import { AppTabbar } from './app-tab/app.tabbar';
+import { TabService } from './app-tab/tab.service';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
-    template: `<div class="layout-wrapper" [ngClass]="containerClass">
+    // imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    // template: `<div class="layout-wrapper" [ngClass]="containerClass">
+    //     <app-topbar></app-topbar>
+    //     <app-sidebar></app-sidebar>
+    //     <div class="layout-main-container !pt-32 sm:!pt-[48px]">
+    //         <div class="layout-main">
+    //             <router-outlet></router-outlet>
+    //         </div>
+    //     </div>
+    //     <div class="layout-mask animate-fadein"></div>
+    // </div> `
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, AppTabbar],
+    template: `
+    <div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
         <div class="layout-main-container !pt-32 sm:!pt-[48px]">
+            <app-tabbar></app-tabbar>
             <div class="layout-main">
                 <router-outlet></router-outlet>
             </div>
         </div>
         <div class="layout-mask animate-fadein"></div>
-    </div> `
+    </div>
+`
 })
 export class AppLayout {
     overlayMenuOpenSubscription: Subscription;
@@ -34,7 +50,8 @@ export class AppLayout {
     constructor(
         public layoutService: LayoutService,
         public renderer: Renderer2,
-        public router: Router
+        public router: Router,
+        public tabService: TabService
     ) {
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
             if (!this.menuOutsideClickListener) {

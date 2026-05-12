@@ -7,7 +7,7 @@ import { AppMenu } from './app-memu/app.menu';
     imports: [AppMenu],
     template:
         `
-        <div class="layout-sidebar pt-[0.5rem] px-[0.5rem] pb-[4rem] lg:pb-[0.5rem]">
+        <div class="layout-sidebar pt-[0.5rem] px-[0.5rem] pb-[4rem] lg:pb-[0.5rem] dark:bg-eis-dark-blue">
             <app-menu></app-menu>
         </div>
         `
