@@ -24,25 +24,9 @@ export class AppMenu implements OnInit {
 
     MENU_ITEMS_ENG = [
         {
-            title: 'E-commerce',
-            icon: 'shopping-cart-outline',
-            link: '/pages/dashboard',
-            home: true,
-            hidden: true,
-        },
-        {
-            title: 'IoT Dashboard',
-            icon: 'home-outline',
-            link: '/pages/iot-dashboard',
-            hidden: true,
-        },
-        {
-            title: 'FEATURES',
-            group: true,
-        },
-        {
             title: 'DCC',
             icon: 'monitor-outline',
+            hidden:true,
             children: [
                 {
                     title: 'Product Management(DT)',
@@ -549,6 +533,10 @@ export class AppMenu implements OnInit {
                 {
                     title: 'User Config',
                     link: '/pages/userconfig',
+                },
+                {
+                    title: 'Role Config',
+                    link: '/pages/role-config',
                 },
             ],
         },

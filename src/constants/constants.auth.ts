@@ -1,7 +1,7 @@
 // constants.ts
 export const Name_Token = 'eis_v3_token';
 export const Name_Remember = 'eiv_v3-remember';
-export const Name_Dark = '.eiv_v3-app-dark';
+export const Name_Dark = '.app-dark';
 export const Name_ThemeLayout = 'eiv_v3-theme-layout';
 export const Name_Language = 'language';
 export const Name_Role = {

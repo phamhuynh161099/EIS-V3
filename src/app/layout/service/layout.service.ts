@@ -116,17 +116,23 @@ export class LayoutService {
             .then(() => {
                 this.onTransitionEnd();
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     toggleDarkMode(config?: layoutConfig): void {
         const _config = config || this.layoutConfig();
         if (_config.darkTheme) {
+            document.documentElement.classList.remove('app-dark')
+            document.documentElement.classList.remove('light')
+
             document.documentElement.classList.add('app-dark');
-            document.documentElement.classList.remove('light');
+            // document.documentElement.classList.remove('light');
         } else {
-             document.documentElement.classList.add('light');
-             document.documentElement.classList.remove('app-dark');
+            document.documentElement.classList.remove('app-dark')
+            document.documentElement.classList.remove('light')
+
+            document.documentElement.classList.add('light');
+            //  document.documentElement.classList.remove('app-dark');
         }
     }
 

@@ -58,5 +58,6 @@ export const pp_management = {
 }
 
 export const user_management = {
-    UserConfig: "userconfig"
+    UserConfig: "userconfig",
+    RoleConfig: "role-config"
 }

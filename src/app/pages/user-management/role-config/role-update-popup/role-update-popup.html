@@ -1,0 +1,142 @@
+<div class="relative dark:bg-eis-dark-blue">
+
+    <div class="no-scrollbar max-h-[60vh] overflow-y-auto px-4 pb-4">
+
+        <!-- Basic fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+            <!-- Role ID (readonly) -->
+            <div class="flex flex-col gap-1.5 md:col-span-2">
+                <label class="text-sm font-medium text-gray-700">
+                    Role Id <span class="text-red-600">(*)</span>
+                </label>
+                <input
+                    pInputText
+                    [ngModel]="dataEdit.id"
+                    disabled
+                    class="w-full bg-slate-200 text-red-700 font-bold opacity-100"
+                />
+            </div>
+
+            <!-- Role Name -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Role Name</label>
+                <input
+                    pInputText
+                    [(ngModel)]="dataEdit.name"
+                    placeholder="Enter role name"
+                    class="w-full"
+                />
+            </div>
+
+            <!-- Description -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                    pTextarea
+                    [(ngModel)]="dataEdit.description"
+                    placeholder="Type your message here."
+                    rows="3"
+                    class="w-full resize-none"
+                ></textarea>
+            </div>
+        </div>
+
+        <!-- ── Permissions ─────────────────────────────────────────── -->
+        <div class="space-y-3">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Permissions</h2>
+                <p class="text-sm text-gray-500">
+                    {{ selectedCount }} of {{ permissions.length }} permissions selected
+                </p>
+            </div>
+
+            @for (group of groupedEntries; track group.category) {
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+
+                <!-- Category header row -->
+                <div
+                    class="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                    (click)="toggleCategory(group.category)"
+                >
+                    <div class="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            class="w-4 h-4 accent-violet-600 cursor-pointer"
+                            [checked]="getCategoryState(group.category) === 'all'"
+                            [indeterminate]="getCategoryState(group.category) === 'indeterminate'"
+                            (change)="toggleCategory(group.category)"
+                            (click)="$event.stopPropagation()"
+                        />
+                    </div>
+
+                    <span class="font-semibold text-sm text-gray-700 flex-1">
+                        {{ group.category }}
+                    </span>
+
+                    <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                        [ngClass]="getCategoryClass(group.category)"
+                    >
+                        {{ getCategoryCheckedCount(group.category) }}/{{ group.perms.length }}
+                    </span>
+                </div>
+
+                <!-- Permission rows -->
+                <div class="divide-y divide-gray-100">
+                    @for (perm of group.perms; track perm.ID) {
+                    <label
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                        <div class="w-5"></div>
+
+                        <!--
+                            ✅ +perm.ID ép về number ngay trong template
+                            Tránh trường hợp API trả string "1" !== number 1
+                        -->
+                        <input
+                            type="checkbox"
+                            class="w-4 h-4 accent-violet-600 cursor-pointer"
+                            [checked]="selectedIds.includes(+perm.ID)"
+                            (change)="togglePermission(+perm.ID)"
+                        />
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-sm font-medium text-gray-800">
+                                    {{ perm.DESCRIPTION }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center px-1.5 py-0.5 rounded border text-xs capitalize font-medium"
+                                    [ngClass]="getActionClass(perm.ACTION)"
+                                >
+                                    {{ perm.ACTION }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-400">{{ perm.NAME }}</span>
+                        </div>
+                    </label>
+                    }
+                </div>
+
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────────────── -->
+    <div class="flex justify-end gap-2 px-4 pt-3 border-t border-gray-200">
+        <p-button
+            label="Cancel"
+            icon="pi pi-times"
+            severity="secondary"
+            (onClick)="closePopup()"
+        />
+        <p-button
+            label="Save changes"
+            icon="pi pi-save"
+            (onClick)="onSubmit()"
+        />
+    </div>
+
+</div>

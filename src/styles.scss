@@ -1247,3 +1247,37 @@ app-user-config {
         }
     }
 }
+
+app-role-config {
+    #grid_role_config {
+        ::-webkit-scrollbar {
+            width: 12px !important;
+            height: 12px !important;
+            position: absolute;
+        }
+
+        .pq-grid-row {
+            &:hover {
+                .pq-grid-cell {
+                    background-color: #333 !important;
+                }
+
+                background-color: #333 !important;
+            }
+        }
+
+        .pq-grid-row:last-child>.pq-grid-col {
+            background-color: #4f535e;
+        }
+
+        .pq-editor-outer>.pq-editor-inner>textarea {
+            color: red !important;
+            background-color: white !important;
+        }
+
+        .pq-grid-cell>div {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+}

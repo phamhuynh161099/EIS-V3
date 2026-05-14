@@ -6,7 +6,7 @@ import { CustomReuseStrategy } from '../../../strategy/custom-reuse-strategy';
 
 @Injectable({ providedIn: 'root' })
 export class TabService {
-    LIMIT_TAB_ACTIVE = 2;
+    LIMIT_TAB_ACTIVE = 4;
 
     private _tabs = signal<AppTab[]>([]);
     private _activeTabId = signal<string | null>(null);
